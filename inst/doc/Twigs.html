@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+
+
+
+<title>Twigs</title>
+
+<script>// Pandoc 2.9 adds attributes on both header and div. We remove the former (to
+// be compatible with the behavior of Pandoc < 2.8).
+document.addEventListener('DOMContentLoaded', function(e) {
+  var hs = document.querySelectorAll("div.section[class*='level'] > :first-child");
+  var i, h, a;
+  for (i = 0; i < hs.length; i++) {
+    h = hs[i];
+    if (!/^h[1-6]$/i.test(h.tagName)) continue;  // it should be a header h1-h6
+    a = h.attributes;
+    while (a.length > 0) h.removeAttribute(a[0].name);
+  }
+});
+</script>
+
+<style type="text/css">
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+span.underline{text-decoration: underline;}
+div.column{display: inline-block; vertical-align: top; width: 50%;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+</style>
+
+
+
+<style type="text/css">
+code {
+white-space: pre;
+}
+.sourceCode {
+overflow: visible;
+}
+</style>
+<style type="text/css" data-origin="pandoc">
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+{ counter-reset: source-line 0; }
+pre.numberSource code > span
+{ position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+{ content: counter(source-line);
+position: relative; left: -1em; text-align: right; vertical-align: baseline;
+border: none; display: inline-block;
+-webkit-touch-callout: none; -webkit-user-select: none;
+-khtml-user-select: none; -moz-user-select: none;
+-ms-user-select: none; user-select: none;
+padding: 0 4px; width: 4em;
+color: #aaaaaa;
+}
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa; padding-left: 4px; }
+div.sourceCode
+{ }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } 
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.at { color: #7d9029; } 
+code span.bn { color: #40a070; } 
+code span.bu { color: #008000; } 
+code span.cf { color: #007020; font-weight: bold; } 
+code span.ch { color: #4070a0; } 
+code span.cn { color: #880000; } 
+code span.co { color: #60a0b0; font-style: italic; } 
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.do { color: #ba2121; font-style: italic; } 
+code span.dt { color: #902000; } 
+code span.dv { color: #40a070; } 
+code span.er { color: #ff0000; font-weight: bold; } 
+code span.ex { } 
+code span.fl { color: #40a070; } 
+code span.fu { color: #06287e; } 
+code span.im { color: #008000; font-weight: bold; } 
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.kw { color: #007020; font-weight: bold; } 
+code span.op { color: #666666; } 
+code span.ot { color: #007020; } 
+code span.pp { color: #bc7a00; } 
+code span.sc { color: #4070a0; } 
+code span.ss { color: #bb6688; } 
+code span.st { color: #4070a0; } 
+code span.va { color: #19177c; } 
+code span.vs { color: #4070a0; } 
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } 
+</style>
+<script>
+// apply pandoc div.sourceCode style to pre.sourceCode instead
+(function() {
+  var sheets = document.styleSheets;
+  for (var i = 0; i < sheets.length; i++) {
+    if (sheets[i].ownerNode.dataset["origin"] !== "pandoc") continue;
+    try { var rules = sheets[i].cssRules; } catch (e) { continue; }
+    var j = 0;
+    while (j < rules.length) {
+      var rule = rules[j];
+      // check if there is a div.sourceCode rule
+      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") {
+        j++;
+        continue;
+      }
+      var style = rule.style.cssText;
+      // check if color or background-color is set
+      if (rule.style.color === '' && rule.style.backgroundColor === '') {
+        j++;
+        continue;
+      }
+      // replace div.sourceCode by a pre.sourceCode rule
+      sheets[i].deleteRule(j);
+      sheets[i].insertRule('pre.sourceCode{' + style + '}', j);
+    }
+  }
+})();
+</script>
+
+
+
+
+<style type="text/css">body {
+background-color: #fff;
+margin: 1em auto;
+max-width: 700px;
+overflow: visible;
+padding-left: 2em;
+padding-right: 2em;
+font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+font-size: 14px;
+line-height: 1.35;
+}
+#TOC {
+clear: both;
+margin: 0 0 10px 10px;
+padding: 4px;
+width: 400px;
+border: 1px solid #CCCCCC;
+border-radius: 5px;
+background-color: #f6f6f6;
+font-size: 13px;
+line-height: 1.3;
+}
+#TOC .toctitle {
+font-weight: bold;
+font-size: 15px;
+margin-left: 5px;
+}
+#TOC ul {
+padding-left: 40px;
+margin-left: -1.5em;
+margin-top: 5px;
+margin-bottom: 5px;
+}
+#TOC ul ul {
+margin-left: -2em;
+}
+#TOC li {
+line-height: 16px;
+}
+table {
+margin: 1em auto;
+border-width: 1px;
+border-color: #DDDDDD;
+border-style: outset;
+border-collapse: collapse;
+}
+table th {
+border-width: 2px;
+padding: 5px;
+border-style: inset;
+}
+table td {
+border-width: 1px;
+border-style: inset;
+line-height: 18px;
+padding: 5px 5px;
+}
+table, table th, table td {
+border-left-style: none;
+border-right-style: none;
+}
+table thead, table tr.even {
+background-color: #f7f7f7;
+}
+p {
+margin: 0.5em 0;
+}
+blockquote {
+background-color: #f6f6f6;
+padding: 0.25em 0.75em;
+}
+hr {
+border-style: solid;
+border: none;
+border-top: 1px solid #777;
+margin: 28px 0;
+}
+dl {
+margin-left: 0;
+}
+dl dd {
+margin-bottom: 13px;
+margin-left: 13px;
+}
+dl dt {
+font-weight: bold;
+}
+ul {
+margin-top: 0;
+}
+ul li {
+list-style: circle outside;
+}
+ul ul {
+margin-bottom: 0;
+}
+pre, code {
+background-color: #f7f7f7;
+border-radius: 3px;
+color: #333;
+white-space: pre-wrap; 
+}
+pre {
+border-radius: 3px;
+margin: 5px 0px 10px 0px;
+padding: 10px;
+}
+pre:not([class]) {
+background-color: #f7f7f7;
+}
+code {
+font-family: Consolas, Monaco, 'Courier New', monospace;
+font-size: 85%;
+}
+p > code, li > code {
+padding: 2px 0px;
+}
+div.figure {
+text-align: center;
+}
+img {
+background-color: #FFFFFF;
+padding: 2px;
+border: 1px solid #DDDDDD;
+border-radius: 3px;
+border: 1px solid #CCCCCC;
+margin: 0 5px;
+}
+h1 {
+margin-top: 0;
+font-size: 35px;
+line-height: 40px;
+}
+h2 {
+border-bottom: 4px solid #f7f7f7;
+padding-top: 10px;
+padding-bottom: 2px;
+font-size: 145%;
+}
+h3 {
+border-bottom: 2px solid #f7f7f7;
+padding-top: 10px;
+font-size: 120%;
+}
+h4 {
+border-bottom: 1px solid #f7f7f7;
+margin-left: 8px;
+font-size: 105%;
+}
+h5, h6 {
+border-bottom: 1px solid #ccc;
+font-size: 105%;
+}
+a {
+color: #0033dd;
+text-decoration: none;
+}
+a:hover {
+color: #6666ff; }
+a:visited {
+color: #800080; }
+a:visited:hover {
+color: #BB00BB; }
+a[href^="http:"] {
+text-decoration: underline; }
+a[href^="https:"] {
+text-decoration: underline; }
+
+code > span.kw { color: #555; font-weight: bold; } 
+code > span.dt { color: #902000; } 
+code > span.dv { color: #40a070; } 
+code > span.bn { color: #d14; } 
+code > span.fl { color: #d14; } 
+code > span.ch { color: #d14; } 
+code > span.st { color: #d14; } 
+code > span.co { color: #888888; font-style: italic; } 
+code > span.ot { color: #007020; } 
+code > span.al { color: #ff0000; font-weight: bold; } 
+code > span.fu { color: #900; font-weight: bold; } 
+code > span.er { color: #a61717; background-color: #e3d2d2; } 
+</style>
+
+
+
+
+</head>
+
+<body>
+
+
+
+
+<h1 class="title toc-ignore">Twigs</h1>
+
+
+
+<div id="background" class="section level2">
+<h2>Background</h2>
+<p>Twigs are the smallest above ground woody component of a tree. Twigs
+are responsible for supporting the delicate tissues needed to grow
+leaves and protect the buds during the dormant season. Because twig
+measurements are the basis for the Real Twig method, and publicly
+available databases of twigs are limited, we present a database of twig
+measurements for a wide range of tree genera and species.</p>
+</div>
+<div id="installation" class="section level2">
+<h2>Installation</h2>
+<p>You can install the package directly from <a href="https://CRAN.R-project.org">CRAN</a>:</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a><span class="fu">install.packages</span>(<span class="st">&quot;rTwig&quot;</span>)</span></code></pre></div>
+<p>Or the latest development version from <a href="https://github.com/">GitHub</a>:</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" tabindex="-1"></a>devtools<span class="sc">::</span><span class="fu">install_github</span>(<span class="st">&quot;https://github.com/aidanmorales/rTwig&quot;</span>)</span></code></pre></div>
+</div>
+<div id="load-packages" class="section level2">
+<h2>Load Packages</h2>
+<p>The first step is to load the rTwig package.</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" tabindex="-1"></a><span class="fu">library</span>(rTwig)</span>
+<span id="cb3-2"><a href="#cb3-2" tabindex="-1"></a></span>
+<span id="cb3-3"><a href="#cb3-3" tabindex="-1"></a><span class="co"># Useful packages</span></span>
+<span id="cb3-4"><a href="#cb3-4" tabindex="-1"></a><span class="fu">library</span>(dplyr)</span>
+<span id="cb3-5"><a href="#cb3-5" tabindex="-1"></a><span class="fu">library</span>(ggplot2)</span></code></pre></div>
+</div>
+<div id="twig-database" class="section level2">
+<h2>Twig Database</h2>
+<p>The twig database is built directly into rTwig and can be called as
+follows:</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" tabindex="-1"></a><span class="co"># If the rTwig library has been loaded</span></span>
+<span id="cb4-2"><a href="#cb4-2" tabindex="-1"></a>twigs</span></code></pre></div>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" tabindex="-1"></a><span class="co"># If rTwig hasn&#39;t been loaded, but just the twigs are needed</span></span>
+<span id="cb5-2"><a href="#cb5-2" tabindex="-1"></a>rTwig<span class="sc">::</span>twigs</span>
+<span id="cb5-3"><a href="#cb5-3" tabindex="-1"></a><span class="co">#&gt; # A tibble: 96 × 7</span></span>
+<span id="cb5-4"><a href="#cb5-4" tabindex="-1"></a><span class="co">#&gt;    scientific.name  radius.mm     n   min   max   std    cv</span></span>
+<span id="cb5-5"><a href="#cb5-5" tabindex="-1"></a><span class="co">#&gt;    &lt;chr&gt;                &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;</span></span>
+<span id="cb5-6"><a href="#cb5-6" tabindex="-1"></a><span class="co">#&gt;  1 Abies concolor        1.43    21  0.89  1.9   0.28  0.19</span></span>
+<span id="cb5-7"><a href="#cb5-7" tabindex="-1"></a><span class="co">#&gt;  2 Abies spp.            1.43    21  0.89  1.9   0.28  0.19</span></span>
+<span id="cb5-8"><a href="#cb5-8" tabindex="-1"></a><span class="co">#&gt;  3 Acer platanoides      1.39    30  0.89  2.03  0.3   0.21</span></span>
+<span id="cb5-9"><a href="#cb5-9" tabindex="-1"></a><span class="co">#&gt;  4 Acer rubrum           1.18    30  0.89  1.52  0.16  0.14</span></span>
+<span id="cb5-10"><a href="#cb5-10" tabindex="-1"></a><span class="co">#&gt;  5 Acer saccharinum      1.41    14  0.89  1.9   0.27  0.2 </span></span>
+<span id="cb5-11"><a href="#cb5-11" tabindex="-1"></a><span class="co">#&gt;  6 Acer saccharum        1.2     30  0.89  1.65  0.23  0.19</span></span>
+<span id="cb5-12"><a href="#cb5-12" tabindex="-1"></a><span class="co">#&gt;  7 Acer spp.             1.29   104  0.89  2.03  0.23  0.18</span></span>
+<span id="cb5-13"><a href="#cb5-13" tabindex="-1"></a><span class="co">#&gt;  8 Aesculus flava        2.67     8  2.29  2.79  0.2   0.08</span></span>
+<span id="cb5-14"><a href="#cb5-14" tabindex="-1"></a><span class="co">#&gt;  9 Aesculus spp.         2.67     8  2.29  2.79  0.2   0.08</span></span>
+<span id="cb5-15"><a href="#cb5-15" tabindex="-1"></a><span class="co">#&gt; 10 Betula nigra          0.85    30  0.51  1.52  0.23  0.27</span></span>
+<span id="cb5-16"><a href="#cb5-16" tabindex="-1"></a><span class="co">#&gt; # ℹ 86 more rows</span></span></code></pre></div>
+<p>The database is broken into 7 different columns.
+<em>scientific.name</em> is the specific epithet. Genus spp. is the
+average of all of the species in the genus. <em>radius.mm</em> is the
+twig radius in millimeters. For each species, <em>n</em> is the number
+of unique twig samples taken, <em>min</em> is the minimum twig radius,
+<em>max</em> is the max twig radius, <em>std</em> is the standard
+deviation, and <em>cv</em> is the coefficient of variation.</p>
+<p>Let’s see the breakdown of species.</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" tabindex="-1"></a><span class="fu">unique</span>(twigs<span class="sc">$</span>scientific.name)</span>
+<span id="cb6-2"><a href="#cb6-2" tabindex="-1"></a><span class="co">#&gt;  [1] &quot;Abies concolor&quot;               &quot;Abies spp.&quot;                  </span></span>
+<span id="cb6-3"><a href="#cb6-3" tabindex="-1"></a><span class="co">#&gt;  [3] &quot;Acer platanoides&quot;             &quot;Acer rubrum&quot;                 </span></span>
+<span id="cb6-4"><a href="#cb6-4" tabindex="-1"></a><span class="co">#&gt;  [5] &quot;Acer saccharinum&quot;             &quot;Acer saccharum&quot;              </span></span>
+<span id="cb6-5"><a href="#cb6-5" tabindex="-1"></a><span class="co">#&gt;  [7] &quot;Acer spp.&quot;                    &quot;Aesculus flava&quot;              </span></span>
+<span id="cb6-6"><a href="#cb6-6" tabindex="-1"></a><span class="co">#&gt;  [9] &quot;Aesculus spp.&quot;                &quot;Betula nigra&quot;                </span></span>
+<span id="cb6-7"><a href="#cb6-7" tabindex="-1"></a><span class="co">#&gt; [11] &quot;Betula spp.&quot;                  &quot;Carya cordiformis&quot;           </span></span>
+<span id="cb6-8"><a href="#cb6-8" tabindex="-1"></a><span class="co">#&gt; [13] &quot;Carya ovata&quot;                  &quot;Carya spp.&quot;                  </span></span>
+<span id="cb6-9"><a href="#cb6-9" tabindex="-1"></a><span class="co">#&gt; [15] &quot;Cercis canadensis&quot;            &quot;Cercis spp.&quot;                 </span></span>
+<span id="cb6-10"><a href="#cb6-10" tabindex="-1"></a><span class="co">#&gt; [17] &quot;Cladrastis kentukea&quot;          &quot;Cladrastis spp.&quot;             </span></span>
+<span id="cb6-11"><a href="#cb6-11" tabindex="-1"></a><span class="co">#&gt; [19] &quot;Cornus mas&quot;                   &quot;Cornus officinalis&quot;          </span></span>
+<span id="cb6-12"><a href="#cb6-12" tabindex="-1"></a><span class="co">#&gt; [21] &quot;Cornus spp.&quot;                  &quot;Crataegus spp.&quot;              </span></span>
+<span id="cb6-13"><a href="#cb6-13" tabindex="-1"></a><span class="co">#&gt; [23] &quot;Fagus grandifolia&quot;            &quot;Fagus spp.&quot;                  </span></span>
+<span id="cb6-14"><a href="#cb6-14" tabindex="-1"></a><span class="co">#&gt; [25] &quot;Fagus sylvatica&quot;              &quot;Fraxinus americana&quot;          </span></span>
+<span id="cb6-15"><a href="#cb6-15" tabindex="-1"></a><span class="co">#&gt; [27] &quot;Fraxinus pennsylvanica&quot;       &quot;Fraxinus quadrangulata&quot;      </span></span>
+<span id="cb6-16"><a href="#cb6-16" tabindex="-1"></a><span class="co">#&gt; [29] &quot;Fraxinus spp.&quot;                &quot;Gleditsia spp.&quot;              </span></span>
+<span id="cb6-17"><a href="#cb6-17" tabindex="-1"></a><span class="co">#&gt; [31] &quot;Gleditsia triacanthos&quot;        &quot;Gymnocladus dioicus&quot;         </span></span>
+<span id="cb6-18"><a href="#cb6-18" tabindex="-1"></a><span class="co">#&gt; [33] &quot;Gymnocladus spp.&quot;             &quot;Gymnopodium floribundum&quot;     </span></span>
+<span id="cb6-19"><a href="#cb6-19" tabindex="-1"></a><span class="co">#&gt; [35] &quot;Gymnopodium spp.&quot;             &quot;Juglans cinerea&quot;             </span></span>
+<span id="cb6-20"><a href="#cb6-20" tabindex="-1"></a><span class="co">#&gt; [37] &quot;Juglans nigra&quot;                &quot;Juglans spp.&quot;                </span></span>
+<span id="cb6-21"><a href="#cb6-21" tabindex="-1"></a><span class="co">#&gt; [39] &quot;Laguncularia racemosa&quot;        &quot;Laguncularia spp.&quot;           </span></span>
+<span id="cb6-22"><a href="#cb6-22" tabindex="-1"></a><span class="co">#&gt; [41] &quot;Larix laricina&quot;               &quot;Larix spp.&quot;                  </span></span>
+<span id="cb6-23"><a href="#cb6-23" tabindex="-1"></a><span class="co">#&gt; [43] &quot;Liriodendron spp.&quot;            &quot;Liriodendron tulipifera&quot;     </span></span>
+<span id="cb6-24"><a href="#cb6-24" tabindex="-1"></a><span class="co">#&gt; [45] &quot;Magnolia acuminata&quot;           &quot;Magnolia spp.&quot;               </span></span>
+<span id="cb6-25"><a href="#cb6-25" tabindex="-1"></a><span class="co">#&gt; [47] &quot;Malus spp.&quot;                   &quot;Metasequoia glyptostroboides&quot;</span></span>
+<span id="cb6-26"><a href="#cb6-26" tabindex="-1"></a><span class="co">#&gt; [49] &quot;Metasequoia spp.&quot;             &quot;Nyssa spp.&quot;                  </span></span>
+<span id="cb6-27"><a href="#cb6-27" tabindex="-1"></a><span class="co">#&gt; [51] &quot;Nyssa sylvatica&quot;              &quot;Ostrya spp.&quot;                 </span></span>
+<span id="cb6-28"><a href="#cb6-28" tabindex="-1"></a><span class="co">#&gt; [53] &quot;Ostrya virginiana&quot;            &quot;Phellodendron amurense&quot;      </span></span>
+<span id="cb6-29"><a href="#cb6-29" tabindex="-1"></a><span class="co">#&gt; [55] &quot;Phellodendron spp.&quot;           &quot;Picea abies&quot;                 </span></span>
+<span id="cb6-30"><a href="#cb6-30" tabindex="-1"></a><span class="co">#&gt; [57] &quot;Picea omorika&quot;                &quot;Picea pungens&quot;               </span></span>
+<span id="cb6-31"><a href="#cb6-31" tabindex="-1"></a><span class="co">#&gt; [59] &quot;Picea spp.&quot;                   &quot;Pinus nigra&quot;                 </span></span>
+<span id="cb6-32"><a href="#cb6-32" tabindex="-1"></a><span class="co">#&gt; [61] &quot;Pinus spp.&quot;                   &quot;Pinus strobus&quot;               </span></span>
+<span id="cb6-33"><a href="#cb6-33" tabindex="-1"></a><span class="co">#&gt; [63] &quot;Platanus acerifolia&quot;          &quot;Platanus occidentalis&quot;       </span></span>
+<span id="cb6-34"><a href="#cb6-34" tabindex="-1"></a><span class="co">#&gt; [65] &quot;Platanus spp.&quot;                &quot;Populus deltoides&quot;           </span></span>
+<span id="cb6-35"><a href="#cb6-35" tabindex="-1"></a><span class="co">#&gt; [67] &quot;Populus spp.&quot;                 &quot;Prunus serotina&quot;             </span></span>
+<span id="cb6-36"><a href="#cb6-36" tabindex="-1"></a><span class="co">#&gt; [69] &quot;Prunus spp.&quot;                  &quot;Prunus virginiana&quot;           </span></span>
+<span id="cb6-37"><a href="#cb6-37" tabindex="-1"></a><span class="co">#&gt; [71] &quot;Quercus acutissima&quot;           &quot;Quercus alba&quot;                </span></span>
+<span id="cb6-38"><a href="#cb6-38" tabindex="-1"></a><span class="co">#&gt; [73] &quot;Quercus bicolor&quot;              &quot;Quercus coccinea&quot;            </span></span>
+<span id="cb6-39"><a href="#cb6-39" tabindex="-1"></a><span class="co">#&gt; [75] &quot;Quercus ellipsoidalis&quot;        &quot;Quercus imbricaria&quot;          </span></span>
+<span id="cb6-40"><a href="#cb6-40" tabindex="-1"></a><span class="co">#&gt; [77] &quot;Quercus macrocarpa&quot;           &quot;Quercus michauxii&quot;           </span></span>
+<span id="cb6-41"><a href="#cb6-41" tabindex="-1"></a><span class="co">#&gt; [79] &quot;Quercus muehlenbergii&quot;        &quot;Quercus palustris&quot;           </span></span>
+<span id="cb6-42"><a href="#cb6-42" tabindex="-1"></a><span class="co">#&gt; [81] &quot;Quercus robur&quot;                &quot;Quercus rubra&quot;               </span></span>
+<span id="cb6-43"><a href="#cb6-43" tabindex="-1"></a><span class="co">#&gt; [83] &quot;Quercus spp.&quot;                 &quot;Quercus velutina&quot;            </span></span>
+<span id="cb6-44"><a href="#cb6-44" tabindex="-1"></a><span class="co">#&gt; [85] &quot;Rhizophora mangle&quot;            &quot;Rhizophora spp.&quot;             </span></span>
+<span id="cb6-45"><a href="#cb6-45" tabindex="-1"></a><span class="co">#&gt; [87] &quot;Thuja occidentalis&quot;           &quot;Thuja spp.&quot;                  </span></span>
+<span id="cb6-46"><a href="#cb6-46" tabindex="-1"></a><span class="co">#&gt; [89] &quot;Tilia americana&quot;              &quot;Tilia spp.&quot;                  </span></span>
+<span id="cb6-47"><a href="#cb6-47" tabindex="-1"></a><span class="co">#&gt; [91] &quot;Tilia tomentosa&quot;              &quot;Tsuga canadensis&quot;            </span></span>
+<span id="cb6-48"><a href="#cb6-48" tabindex="-1"></a><span class="co">#&gt; [93] &quot;Tsuga spp.&quot;                   &quot;Ulmus americana&quot;             </span></span>
+<span id="cb6-49"><a href="#cb6-49" tabindex="-1"></a><span class="co">#&gt; [95] &quot;Ulmus rubra&quot;                  &quot;Ulmus spp.&quot;</span></span></code></pre></div>
+</div>
+<div id="visualization" class="section level2">
+<h2>Visualization</h2>
+<p>Let’s visualize some of the twig data!</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" tabindex="-1"></a><span class="co"># Lets look at a subset of oak species</span></span>
+<span id="cb7-2"><a href="#cb7-2" tabindex="-1"></a>twigs <span class="sc">%&gt;%</span></span>
+<span id="cb7-3"><a href="#cb7-3" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="fu">grepl</span>(<span class="st">&quot;Quercus&quot;</span>, scientific.name)) <span class="sc">%&gt;%</span></span>
+<span id="cb7-4"><a href="#cb7-4" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> scientific.name, <span class="at">y =</span> radius.mm, <span class="at">color =</span> scientific.name)) <span class="sc">+</span></span>
+<span id="cb7-5"><a href="#cb7-5" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="fu">aes</span>(<span class="at">size =</span> n)) <span class="sc">+</span></span>
+<span id="cb7-6"><a href="#cb7-6" tabindex="-1"></a>  <span class="fu">geom_errorbar</span>(<span class="fu">aes</span>(<span class="at">ymax =</span> max, <span class="at">ymin =</span> min)) <span class="sc">+</span></span>
+<span id="cb7-7"><a href="#cb7-7" tabindex="-1"></a>  <span class="fu">coord_flip</span>() <span class="sc">+</span></span>
+<span id="cb7-8"><a href="#cb7-8" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
+<span id="cb7-9"><a href="#cb7-9" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">&quot;Quercus Twig Radii&quot;</span>,</span>
+<span id="cb7-10"><a href="#cb7-10" tabindex="-1"></a>    <span class="at">x =</span> <span class="st">&quot;&quot;</span>,</span>
+<span id="cb7-11"><a href="#cb7-11" tabindex="-1"></a>    <span class="at">y =</span> <span class="st">&quot;Twig Radius (mm)&quot;</span>,</span>
+<span id="cb7-12"><a href="#cb7-12" tabindex="-1"></a>    <span class="at">color =</span> <span class="st">&quot;Species&quot;</span>,</span>
+<span id="cb7-13"><a href="#cb7-13" tabindex="-1"></a>    <span class="at">size =</span> <span class="st">&quot;Sample Size&quot;</span></span>
+<span id="cb7-14"><a href="#cb7-14" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb7-15"><a href="#cb7-15" tabindex="-1"></a>  <span class="fu">scale_x_discrete</span>(<span class="at">limits =</span> rev) <span class="sc">+</span></span>
+<span id="cb7-16"><a href="#cb7-16" tabindex="-1"></a>  <span class="fu">theme_classic</span>()</span></code></pre></div>
+<p><img src="data:image/png;base64,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" /><!-- --></p>
+</div>
+
+
+
+<!-- code folding -->
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>
