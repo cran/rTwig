@@ -1,0 +1,770 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+
+
+
+<title>Overview</title>
+
+<script>// Pandoc 2.9 adds attributes on both header and div. We remove the former (to
+// be compatible with the behavior of Pandoc < 2.8).
+document.addEventListener('DOMContentLoaded', function(e) {
+  var hs = document.querySelectorAll("div.section[class*='level'] > :first-child");
+  var i, h, a;
+  for (i = 0; i < hs.length; i++) {
+    h = hs[i];
+    if (!/^h[1-6]$/i.test(h.tagName)) continue;  // it should be a header h1-h6
+    a = h.attributes;
+    while (a.length > 0) h.removeAttribute(a[0].name);
+  }
+});
+</script>
+
+<style type="text/css">
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+span.underline{text-decoration: underline;}
+div.column{display: inline-block; vertical-align: top; width: 50%;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+</style>
+
+
+
+<style type="text/css">
+code {
+white-space: pre;
+}
+.sourceCode {
+overflow: visible;
+}
+</style>
+<style type="text/css" data-origin="pandoc">
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+{ counter-reset: source-line 0; }
+pre.numberSource code > span
+{ position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+{ content: counter(source-line);
+position: relative; left: -1em; text-align: right; vertical-align: baseline;
+border: none; display: inline-block;
+-webkit-touch-callout: none; -webkit-user-select: none;
+-khtml-user-select: none; -moz-user-select: none;
+-ms-user-select: none; user-select: none;
+padding: 0 4px; width: 4em;
+color: #aaaaaa;
+}
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa; padding-left: 4px; }
+div.sourceCode
+{ }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } 
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.at { color: #7d9029; } 
+code span.bn { color: #40a070; } 
+code span.bu { color: #008000; } 
+code span.cf { color: #007020; font-weight: bold; } 
+code span.ch { color: #4070a0; } 
+code span.cn { color: #880000; } 
+code span.co { color: #60a0b0; font-style: italic; } 
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.do { color: #ba2121; font-style: italic; } 
+code span.dt { color: #902000; } 
+code span.dv { color: #40a070; } 
+code span.er { color: #ff0000; font-weight: bold; } 
+code span.ex { } 
+code span.fl { color: #40a070; } 
+code span.fu { color: #06287e; } 
+code span.im { color: #008000; font-weight: bold; } 
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.kw { color: #007020; font-weight: bold; } 
+code span.op { color: #666666; } 
+code span.ot { color: #007020; } 
+code span.pp { color: #bc7a00; } 
+code span.sc { color: #4070a0; } 
+code span.ss { color: #bb6688; } 
+code span.st { color: #4070a0; } 
+code span.va { color: #19177c; } 
+code span.vs { color: #4070a0; } 
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } 
+</style>
+<script>
+// apply pandoc div.sourceCode style to pre.sourceCode instead
+(function() {
+  var sheets = document.styleSheets;
+  for (var i = 0; i < sheets.length; i++) {
+    if (sheets[i].ownerNode.dataset["origin"] !== "pandoc") continue;
+    try { var rules = sheets[i].cssRules; } catch (e) { continue; }
+    var j = 0;
+    while (j < rules.length) {
+      var rule = rules[j];
+      // check if there is a div.sourceCode rule
+      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") {
+        j++;
+        continue;
+      }
+      var style = rule.style.cssText;
+      // check if color or background-color is set
+      if (rule.style.color === '' && rule.style.backgroundColor === '') {
+        j++;
+        continue;
+      }
+      // replace div.sourceCode by a pre.sourceCode rule
+      sheets[i].deleteRule(j);
+      sheets[i].insertRule('pre.sourceCode{' + style + '}', j);
+    }
+  }
+})();
+</script>
+
+
+
+
+<style type="text/css">body {
+background-color: #fff;
+margin: 1em auto;
+max-width: 700px;
+overflow: visible;
+padding-left: 2em;
+padding-right: 2em;
+font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+font-size: 14px;
+line-height: 1.35;
+}
+#TOC {
+clear: both;
+margin: 0 0 10px 10px;
+padding: 4px;
+width: 400px;
+border: 1px solid #CCCCCC;
+border-radius: 5px;
+background-color: #f6f6f6;
+font-size: 13px;
+line-height: 1.3;
+}
+#TOC .toctitle {
+font-weight: bold;
+font-size: 15px;
+margin-left: 5px;
+}
+#TOC ul {
+padding-left: 40px;
+margin-left: -1.5em;
+margin-top: 5px;
+margin-bottom: 5px;
+}
+#TOC ul ul {
+margin-left: -2em;
+}
+#TOC li {
+line-height: 16px;
+}
+table {
+margin: 1em auto;
+border-width: 1px;
+border-color: #DDDDDD;
+border-style: outset;
+border-collapse: collapse;
+}
+table th {
+border-width: 2px;
+padding: 5px;
+border-style: inset;
+}
+table td {
+border-width: 1px;
+border-style: inset;
+line-height: 18px;
+padding: 5px 5px;
+}
+table, table th, table td {
+border-left-style: none;
+border-right-style: none;
+}
+table thead, table tr.even {
+background-color: #f7f7f7;
+}
+p {
+margin: 0.5em 0;
+}
+blockquote {
+background-color: #f6f6f6;
+padding: 0.25em 0.75em;
+}
+hr {
+border-style: solid;
+border: none;
+border-top: 1px solid #777;
+margin: 28px 0;
+}
+dl {
+margin-left: 0;
+}
+dl dd {
+margin-bottom: 13px;
+margin-left: 13px;
+}
+dl dt {
+font-weight: bold;
+}
+ul {
+margin-top: 0;
+}
+ul li {
+list-style: circle outside;
+}
+ul ul {
+margin-bottom: 0;
+}
+pre, code {
+background-color: #f7f7f7;
+border-radius: 3px;
+color: #333;
+white-space: pre-wrap; 
+}
+pre {
+border-radius: 3px;
+margin: 5px 0px 10px 0px;
+padding: 10px;
+}
+pre:not([class]) {
+background-color: #f7f7f7;
+}
+code {
+font-family: Consolas, Monaco, 'Courier New', monospace;
+font-size: 85%;
+}
+p > code, li > code {
+padding: 2px 0px;
+}
+div.figure {
+text-align: center;
+}
+img {
+background-color: #FFFFFF;
+padding: 2px;
+border: 1px solid #DDDDDD;
+border-radius: 3px;
+border: 1px solid #CCCCCC;
+margin: 0 5px;
+}
+h1 {
+margin-top: 0;
+font-size: 35px;
+line-height: 40px;
+}
+h2 {
+border-bottom: 4px solid #f7f7f7;
+padding-top: 10px;
+padding-bottom: 2px;
+font-size: 145%;
+}
+h3 {
+border-bottom: 2px solid #f7f7f7;
+padding-top: 10px;
+font-size: 120%;
+}
+h4 {
+border-bottom: 1px solid #f7f7f7;
+margin-left: 8px;
+font-size: 105%;
+}
+h5, h6 {
+border-bottom: 1px solid #ccc;
+font-size: 105%;
+}
+a {
+color: #0033dd;
+text-decoration: none;
+}
+a:hover {
+color: #6666ff; }
+a:visited {
+color: #800080; }
+a:visited:hover {
+color: #BB00BB; }
+a[href^="http:"] {
+text-decoration: underline; }
+a[href^="https:"] {
+text-decoration: underline; }
+
+code > span.kw { color: #555; font-weight: bold; } 
+code > span.dt { color: #902000; } 
+code > span.dv { color: #40a070; } 
+code > span.bn { color: #d14; } 
+code > span.fl { color: #d14; } 
+code > span.ch { color: #d14; } 
+code > span.st { color: #d14; } 
+code > span.co { color: #888888; font-style: italic; } 
+code > span.ot { color: #007020; } 
+code > span.al { color: #ff0000; font-weight: bold; } 
+code > span.fu { color: #900; font-weight: bold; } 
+code > span.er { color: #a61717; background-color: #e3d2d2; } 
+</style>
+
+
+
+
+</head>
+
+<body>
+
+
+
+
+<h1 class="title toc-ignore">Overview</h1>
+
+
+
+<div id="background" class="section level2">
+<h2>Background</h2>
+<p>Real Twig was designed and tested using QSMs created with the <a href="https://github.com/InverseTampere/TreeQSM">TreeQSM</a> modeling
+software. If high quality point clouds, QSMs with the proper input
+settings, and species specific twig diameter measurements are supplied,
+you can expect to get very good estimates of tree volume within ± 10% of
+the real tree volume.</p>
+<p>If any given QSM provides parent-child cylinder relationships, Real
+Twig will work, as is the case of the <a href="https://www.simpleforest.org/">SimpleForest</a> and <a href="https://github.com/wanxinyang/treegraph/tree/master">Treegraph</a>
+software packages. If high quality point clouds, QSMs with the proper
+input settings, and species specific twig diameter measurements are
+supplied, you can expect to get good estimates of tree volume across
+multiple different software packages.</p>
+<p>While Real Twig can provide excellent tree volume estimates, it can
+not transform poor quality data into good data. As a general rule of
+thumb, the closer the QSM resembles the actual tree before correction,
+the better the results will be after correction. Real Twig performs best
+when the topology of the tree is correct, and only the cylinder sizes
+are the main sources of QSM error. Errors in QSM topology become readily
+apparent after correction, so Real Twig can also be used to visually
+validate QSM topology without reference data.</p>
+</div>
+<div id="installation" class="section level2">
+<h2>Installation</h2>
+<p>You can install the package directly from <a href="https://CRAN.R-project.org">CRAN</a>:</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a><span class="fu">install.packages</span>(<span class="st">&quot;rTwig&quot;</span>)</span></code></pre></div>
+<p>Or the latest development version from <a href="https://github.com/">GitHub</a>:</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" tabindex="-1"></a>devtools<span class="sc">::</span><span class="fu">install_github</span>(<span class="st">&quot;https://github.com/aidanmorales/rTwig&quot;</span>)</span></code></pre></div>
+</div>
+<div id="load-packages" class="section level2">
+<h2>Load Packages</h2>
+<p>The first step is to load the rTwig package. Real Twig works well
+when paired with packages from the <a href="https://www.tidyverse.org/">Tidyverse</a>, so we will also load
+the dplyr package to help with data manipulation.</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" tabindex="-1"></a><span class="co"># Load rTwig</span></span>
+<span id="cb3-2"><a href="#cb3-2" tabindex="-1"></a><span class="fu">library</span>(rTwig)</span>
+<span id="cb3-3"><a href="#cb3-3" tabindex="-1"></a></span>
+<span id="cb3-4"><a href="#cb3-4" tabindex="-1"></a><span class="co"># Other useful packages</span></span>
+<span id="cb3-5"><a href="#cb3-5" tabindex="-1"></a><span class="fu">library</span>(dplyr)</span></code></pre></div>
+</div>
+<div id="import-qsm" class="section level2">
+<h2>Import QSM</h2>
+<p>rTwig supports all available versions of TreeQSM, from <em>v2.0</em>
+to <em>v2.4.1</em> at the time of writing. It is important to note that
+legacy versions of TreeQSM (<em>v2.0</em>) store data in a much
+different format than modern versions (<em>v2.3.0-2.4.1</em>). It is
+strongly advised to use the latest version of TreeQSM with rTwig for the
+best QSM topology and volume estimates. Older versions can be used, but
+the QSM topology is poor, and volume underestimation is almost
+guaranteed.</p>
+<p>Regardless of the version of TreeQSM or MATLAB used, the
+<code>import_qsm()</code> function will import a QSM (.mat extension)
+and convert the data to a format usable by R. The user must specify
+which version of TreeQSM they are using with the <code>version</code>
+parameter. rTwig automatically defaults to use the new TreeQSM format,
+so the older format can be imported with <code>version = &quot;2.0&quot;</code>.
+<code>import_qsm()</code> also imports all QSM information, including
+cylinder, branch, treedata, rundata, pmdistance, and triangulation data,
+which are stored together as a list.</p>
+<p>SimpleForest exports its QSMs as .csv files, so they are easy to load
+into R using the built in <code>read.csv()</code> function. If the QSM
+contains thousands of cylinders, it is much faster to use the
+<code>fread()</code> function from the <code>data.table</code> package
+to take advantage of multi-threaded support.</p>
+<p>Treegraph exports its QSMs as .json files. To import them into R, we
+can use the <code>import_treegraph()</code> function to quickly load in
+a Treegraph QSM.</p>
+<div id="example-1-treeqsm-v2.3.0---2.4.1" class="section level4">
+<h4>Example 1: TreeQSM v2.3.0 - 2.4.1</h4>
+<p>We can import a QSM by supplying the <code>import_qsm()</code>
+function the directory to our QSM.</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" tabindex="-1"></a><span class="co"># QSM directory</span></span>
+<span id="cb4-2"><a href="#cb4-2" tabindex="-1"></a>file <span class="ot">&lt;-</span> <span class="fu">system.file</span>(<span class="st">&quot;extdata/QSM.mat&quot;</span>, <span class="at">package =</span> <span class="st">&quot;rTwig&quot;</span>)</span>
+<span id="cb4-3"><a href="#cb4-3" tabindex="-1"></a></span>
+<span id="cb4-4"><a href="#cb4-4" tabindex="-1"></a><span class="co"># Import and save QSM</span></span>
+<span id="cb4-5"><a href="#cb4-5" tabindex="-1"></a>qsm <span class="ot">&lt;-</span> <span class="fu">import_qsm</span>(file)</span></code></pre></div>
+<p>The QSM should be a list with six elements. We can check it as
+follows:</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" tabindex="-1"></a><span class="fu">summary</span>(qsm)</span>
+<span id="cb5-2"><a href="#cb5-2" tabindex="-1"></a><span class="co">#&gt;               Length Class      Mode</span></span>
+<span id="cb5-3"><a href="#cb5-3" tabindex="-1"></a><span class="co">#&gt; cylinder      17     data.frame list</span></span>
+<span id="cb5-4"><a href="#cb5-4" tabindex="-1"></a><span class="co">#&gt; branch        10     data.frame list</span></span>
+<span id="cb5-5"><a href="#cb5-5" tabindex="-1"></a><span class="co">#&gt; treedata      91     -none-     list</span></span>
+<span id="cb5-6"><a href="#cb5-6" tabindex="-1"></a><span class="co">#&gt; rundata       45     data.frame list</span></span>
+<span id="cb5-7"><a href="#cb5-7" tabindex="-1"></a><span class="co">#&gt; pmdistance    21     -none-     list</span></span>
+<span id="cb5-8"><a href="#cb5-8" tabindex="-1"></a><span class="co">#&gt; triangulation 12     -none-     list</span></span></code></pre></div>
+<p>Let’s check what version of TreeQSM was used, the date the QSM was
+made, and take a look at the cylinder data.</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" tabindex="-1"></a><span class="co"># QSM info</span></span>
+<span id="cb6-2"><a href="#cb6-2" tabindex="-1"></a>qsm<span class="sc">$</span>rundata<span class="sc">$</span>version</span>
+<span id="cb6-3"><a href="#cb6-3" tabindex="-1"></a><span class="co">#&gt; [1] &quot;2.4.1&quot;</span></span>
+<span id="cb6-4"><a href="#cb6-4" tabindex="-1"></a>qsm<span class="sc">$</span>rundata<span class="sc">$</span>start.date</span>
+<span id="cb6-5"><a href="#cb6-5" tabindex="-1"></a><span class="co">#&gt; [1] &quot;2023-12-06 10:14:31 EST&quot;</span></span>
+<span id="cb6-6"><a href="#cb6-6" tabindex="-1"></a></span>
+<span id="cb6-7"><a href="#cb6-7" tabindex="-1"></a><span class="co"># Number of cylinders</span></span>
+<span id="cb6-8"><a href="#cb6-8" tabindex="-1"></a><span class="fu">str</span>(qsm<span class="sc">$</span>cylinder)</span>
+<span id="cb6-9"><a href="#cb6-9" tabindex="-1"></a><span class="co">#&gt; &#39;data.frame&#39;:    1136 obs. of  17 variables:</span></span>
+<span id="cb6-10"><a href="#cb6-10" tabindex="-1"></a><span class="co">#&gt;  $ radius          : num  0.0465 0.0454 0.0442 0.0437 0.0429 ...</span></span>
+<span id="cb6-11"><a href="#cb6-11" tabindex="-1"></a><span class="co">#&gt;  $ length          : num  0.09392 0.07216 0.06654 0.00938 0.06795 ...</span></span>
+<span id="cb6-12"><a href="#cb6-12" tabindex="-1"></a><span class="co">#&gt;  $ start.x         : num  0.768 0.768 0.768 0.769 0.769 ...</span></span>
+<span id="cb6-13"><a href="#cb6-13" tabindex="-1"></a><span class="co">#&gt;  $ start.y         : num  -16.4 -16.4 -16.4 -16.3 -16.3 ...</span></span>
+<span id="cb6-14"><a href="#cb6-14" tabindex="-1"></a><span class="co">#&gt;  $ start.z         : num  254 254 254 254 254 ...</span></span>
+<span id="cb6-15"><a href="#cb6-15" tabindex="-1"></a><span class="co">#&gt;  $ axis.x          : num  0.00995 -0.0111 0.01364 0.01571 0.01449 ...</span></span>
+<span id="cb6-16"><a href="#cb6-16" tabindex="-1"></a><span class="co">#&gt;  $ axis.y          : num  0.0912 0.0391 0.0367 0.0271 0.0267 ...</span></span>
+<span id="cb6-17"><a href="#cb6-17" tabindex="-1"></a><span class="co">#&gt;  $ axis.z          : num  0.996 0.999 0.999 1 1 ...</span></span>
+<span id="cb6-18"><a href="#cb6-18" tabindex="-1"></a><span class="co">#&gt;  $ parent          : int  0 1 2 3 4 5 6 7 8 9 ...</span></span>
+<span id="cb6-19"><a href="#cb6-19" tabindex="-1"></a><span class="co">#&gt;  $ extension       : int  2 3 4 5 6 7 8 9 10 11 ...</span></span>
+<span id="cb6-20"><a href="#cb6-20" tabindex="-1"></a><span class="co">#&gt;  $ added           : num  0 0 0 0 0 0 0 0 0 0 ...</span></span>
+<span id="cb6-21"><a href="#cb6-21" tabindex="-1"></a><span class="co">#&gt;  $ UnmodRadius     : num  0.0465 0.0454 0.0442 0.0437 0.0429 ...</span></span>
+<span id="cb6-22"><a href="#cb6-22" tabindex="-1"></a><span class="co">#&gt;  $ branch          : int  1 1 1 1 1 1 1 1 1 1 ...</span></span>
+<span id="cb6-23"><a href="#cb6-23" tabindex="-1"></a><span class="co">#&gt;  $ SurfCov         : num  0.875 1 1 1 1 1 1 1 1 1 ...</span></span>
+<span id="cb6-24"><a href="#cb6-24" tabindex="-1"></a><span class="co">#&gt;  $ mad             : num  0.00072 0.000538 0.000523 0.000335 0.000438 ...</span></span>
+<span id="cb6-25"><a href="#cb6-25" tabindex="-1"></a><span class="co">#&gt;  $ BranchOrder     : int  0 0 0 0 0 0 0 0 0 0 ...</span></span>
+<span id="cb6-26"><a href="#cb6-26" tabindex="-1"></a><span class="co">#&gt;  $ PositionInBranch: int  1 2 3 4 5 6 7 8 9 10 ...</span></span></code></pre></div>
+</div>
+<div id="example-2-treeqsm-v2.0" class="section level4">
+<h4>Example 2: TreeQSM v2.0</h4>
+<p>Let’s try importing an old QSM and check its structure.</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" tabindex="-1"></a><span class="co"># QSM Directory</span></span>
+<span id="cb7-2"><a href="#cb7-2" tabindex="-1"></a>file <span class="ot">&lt;-</span> <span class="fu">system.file</span>(<span class="st">&quot;extdata/QSM_2.mat&quot;</span>, <span class="at">package =</span> <span class="st">&quot;rTwig&quot;</span>)</span>
+<span id="cb7-3"><a href="#cb7-3" tabindex="-1"></a></span>
+<span id="cb7-4"><a href="#cb7-4" tabindex="-1"></a><span class="co"># Import and save QSM</span></span>
+<span id="cb7-5"><a href="#cb7-5" tabindex="-1"></a>qsm2 <span class="ot">&lt;-</span> <span class="fu">import_qsm</span>(file, <span class="at">version =</span> <span class="st">&quot;2.0&quot;</span>)</span>
+<span id="cb7-6"><a href="#cb7-6" tabindex="-1"></a></span>
+<span id="cb7-7"><a href="#cb7-7" tabindex="-1"></a><span class="co"># QSM Info</span></span>
+<span id="cb7-8"><a href="#cb7-8" tabindex="-1"></a><span class="fu">summary</span>(qsm2)</span>
+<span id="cb7-9"><a href="#cb7-9" tabindex="-1"></a><span class="co">#&gt;          Length Class      Mode</span></span>
+<span id="cb7-10"><a href="#cb7-10" tabindex="-1"></a><span class="co">#&gt; cylinder 15     data.frame list</span></span>
+<span id="cb7-11"><a href="#cb7-11" tabindex="-1"></a><span class="co">#&gt; treedata 33     -none-     list</span></span>
+<span id="cb7-12"><a href="#cb7-12" tabindex="-1"></a><span class="fu">str</span>(qsm2<span class="sc">$</span>cylinder)</span>
+<span id="cb7-13"><a href="#cb7-13" tabindex="-1"></a><span class="co">#&gt; &#39;data.frame&#39;:    1026 obs. of  15 variables:</span></span>
+<span id="cb7-14"><a href="#cb7-14" tabindex="-1"></a><span class="co">#&gt;  $ radius          : num  0.0612 0.056 0.0553 0.0552 0.0534 ...</span></span>
+<span id="cb7-15"><a href="#cb7-15" tabindex="-1"></a><span class="co">#&gt;  $ length          : num  0.335 0.283 0.272 0.244 0.267 ...</span></span>
+<span id="cb7-16"><a href="#cb7-16" tabindex="-1"></a><span class="co">#&gt;  $ start.x         : num  8.4 8.43 8.44 8.47 8.5 ...</span></span>
+<span id="cb7-17"><a href="#cb7-17" tabindex="-1"></a><span class="co">#&gt;  $ start.y         : num  47.7 47.7 47.7 47.8 47.8 ...</span></span>
+<span id="cb7-18"><a href="#cb7-18" tabindex="-1"></a><span class="co">#&gt;  $ start.z         : num  2.23 2.57 2.85 3.12 3.36 ...</span></span>
+<span id="cb7-19"><a href="#cb7-19" tabindex="-1"></a><span class="co">#&gt;  $ axis.x          : num  0.1103 0.0531 0.0878 0.1666 0.0894 ...</span></span>
+<span id="cb7-20"><a href="#cb7-20" tabindex="-1"></a><span class="co">#&gt;  $ axis.y          : num  0.0337 0.0296 0.1282 0.0801 0.061 ...</span></span>
+<span id="cb7-21"><a href="#cb7-21" tabindex="-1"></a><span class="co">#&gt;  $ axis.z          : num  0.993 0.998 0.988 0.983 0.994 ...</span></span>
+<span id="cb7-22"><a href="#cb7-22" tabindex="-1"></a><span class="co">#&gt;  $ parent          : num  0 1 2 3 4 5 6 7 8 9 ...</span></span>
+<span id="cb7-23"><a href="#cb7-23" tabindex="-1"></a><span class="co">#&gt;  $ extension       : num  1 2 3 4 5 6 7 8 9 10 ...</span></span>
+<span id="cb7-24"><a href="#cb7-24" tabindex="-1"></a><span class="co">#&gt;  $ added           : int  0 0 0 0 0 0 0 0 0 0 ...</span></span>
+<span id="cb7-25"><a href="#cb7-25" tabindex="-1"></a><span class="co">#&gt;  $ UnmodRadius     : num  0.0612 0.056 0.0553 0.0552 0.0534 ...</span></span>
+<span id="cb7-26"><a href="#cb7-26" tabindex="-1"></a><span class="co">#&gt;  $ branch          : num  1 1 1 1 1 1 1 1 1 1 ...</span></span>
+<span id="cb7-27"><a href="#cb7-27" tabindex="-1"></a><span class="co">#&gt;  $ BranchOrder     : num  0 0 0 0 0 0 0 0 0 0 ...</span></span>
+<span id="cb7-28"><a href="#cb7-28" tabindex="-1"></a><span class="co">#&gt;  $ PositionInBranch: num  1 2 3 4 5 6 7 8 9 10 ...</span></span></code></pre></div>
+</div>
+<div id="example-3-simpleforest" class="section level4">
+<h4>Example 3: SimpleForest</h4>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" tabindex="-1"></a><span class="co"># QSM directory</span></span>
+<span id="cb8-2"><a href="#cb8-2" tabindex="-1"></a>file <span class="ot">&lt;-</span> <span class="fu">system.file</span>(<span class="st">&quot;extdata/QSM.csv&quot;</span>, <span class="at">package =</span> <span class="st">&quot;rTwig&quot;</span>)</span>
+<span id="cb8-3"><a href="#cb8-3" tabindex="-1"></a></span>
+<span id="cb8-4"><a href="#cb8-4" tabindex="-1"></a><span class="co"># Import and save QSM cylinder data</span></span>
+<span id="cb8-5"><a href="#cb8-5" tabindex="-1"></a>cylinder <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(file)</span></code></pre></div>
+<p>Let’s take a look at the SimpleForest cylinder data.</p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" tabindex="-1"></a><span class="fu">str</span>(cylinder)</span>
+<span id="cb9-2"><a href="#cb9-2" tabindex="-1"></a><span class="co">#&gt; &#39;data.frame&#39;:    1149 obs. of  17 variables:</span></span>
+<span id="cb9-3"><a href="#cb9-3" tabindex="-1"></a><span class="co">#&gt;  $ ID                  : int  0 1 2 3 4 5 6 7 8 9 ...</span></span>
+<span id="cb9-4"><a href="#cb9-4" tabindex="-1"></a><span class="co">#&gt;  $ parentID            : int  -1 0 1 2 3 4 5 6 7 8 ...</span></span>
+<span id="cb9-5"><a href="#cb9-5" tabindex="-1"></a><span class="co">#&gt;  $ startX              : num  0.761 0.759 0.771 0.768 0.765 ...</span></span>
+<span id="cb9-6"><a href="#cb9-6" tabindex="-1"></a><span class="co">#&gt;  $ startY              : num  -16.4 -16.4 -16.4 -16.3 -16.4 ...</span></span>
+<span id="cb9-7"><a href="#cb9-7" tabindex="-1"></a><span class="co">#&gt;  $ startZ              : num  254 254 254 254 254 ...</span></span>
+<span id="cb9-8"><a href="#cb9-8" tabindex="-1"></a><span class="co">#&gt;  $ endX                : num  0.759 0.771 0.768 0.765 0.769 ...</span></span>
+<span id="cb9-9"><a href="#cb9-9" tabindex="-1"></a><span class="co">#&gt;  $ endY                : num  -16.4 -16.4 -16.3 -16.4 -16.4 ...</span></span>
+<span id="cb9-10"><a href="#cb9-10" tabindex="-1"></a><span class="co">#&gt;  $ endZ                : num  254 254 254 254 254 ...</span></span>
+<span id="cb9-11"><a href="#cb9-11" tabindex="-1"></a><span class="co">#&gt;  $ radius              : num  0.0472 0.0479 0.0469 0.0467 0.0453 ...</span></span>
+<span id="cb9-12"><a href="#cb9-12" tabindex="-1"></a><span class="co">#&gt;  $ length              : num  0.0497 0.0529 0.0535 0.0525 0.0528 ...</span></span>
+<span id="cb9-13"><a href="#cb9-13" tabindex="-1"></a><span class="co">#&gt;  $ growthLength        : num  31.4 31.4 31.3 31.3 31.2 ...</span></span>
+<span id="cb9-14"><a href="#cb9-14" tabindex="-1"></a><span class="co">#&gt;  $ averagePointDistance: num  0.00589 0.00378 0.00205 0.00246 0.00251 ...</span></span>
+<span id="cb9-15"><a href="#cb9-15" tabindex="-1"></a><span class="co">#&gt;  $ segmentID           : int  0 0 0 0 0 0 0 0 0 0 ...</span></span>
+<span id="cb9-16"><a href="#cb9-16" tabindex="-1"></a><span class="co">#&gt;  $ parentSegmentID     : int  -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 ...</span></span>
+<span id="cb9-17"><a href="#cb9-17" tabindex="-1"></a><span class="co">#&gt;  $ branchOrder         : int  0 0 0 0 0 0 0 0 0 0 ...</span></span>
+<span id="cb9-18"><a href="#cb9-18" tabindex="-1"></a><span class="co">#&gt;  $ reverseBranchOrder  : int  18 18 18 18 18 18 18 18 18 18 ...</span></span>
+<span id="cb9-19"><a href="#cb9-19" tabindex="-1"></a><span class="co">#&gt;  $ branchID            : int  0 0 0 0 0 0 0 0 0 0 ...</span></span></code></pre></div>
+</div>
+</div>
+<div id="cylinder-data" class="section level2">
+<h2>Cylinder Data</h2>
+<p>Next, we have to update the parent-child ordering in the cylinder
+data to allow for path analysis and add some new QSM variables. The most
+important QSM variable is growth length. Growth length is a cumulative
+length metric, where the growth length of a cylinder is its length, plus
+the lengths of all of its children. This gives us perfect ordering along
+a branch or a path, where the highest growth length is equal to the base
+of the tree, and twigs have a growth length equal to their cylinder
+length. It is also important to note that the number of twigs in a QSM
+is always equal to the number of paths in a QSM, since a path goes from
+the base of the tree to a twig tip.</p>
+<p>We also calculate several additional variables to improve QSM
+analysis and visualization. The reverse branch order (RBO) assigns an
+order of 1 to the twigs, and works backwards to the base of the main
+stem, which has the highest RBO. The RBO is essentially the maximum node
+depth for any given branch segment (the area between branching forks).
+RBO problematic twig cylinders easy to identify. The distance from each
+cylinder to the base, and the average distance from each cylinder to all
+supported twigs are new ways to help visualize problematic
+cylinders.</p>
+<p>Let’s save the cylinders to a new variable to make it easier to work
+with and update the ordering.</p>
+<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" tabindex="-1"></a><span class="co"># Save cylinders to new object</span></span>
+<span id="cb10-2"><a href="#cb10-2" tabindex="-1"></a>cylinder <span class="ot">&lt;-</span> qsm<span class="sc">$</span>cylinder</span>
+<span id="cb10-3"><a href="#cb10-3" tabindex="-1"></a></span>
+<span id="cb10-4"><a href="#cb10-4" tabindex="-1"></a><span class="co"># Update cylinder data</span></span>
+<span id="cb10-5"><a href="#cb10-5" tabindex="-1"></a>cylinder <span class="ot">&lt;-</span> <span class="fu">update_cylinders</span>(cylinder)</span></code></pre></div>
+</div>
+<div id="topology" class="section level2">
+<h2>Topology</h2>
+<p>Before we correct the QSM, it is often worthwhile to check the
+quality of the QSM by plotting it against its input point cloud. To do
+this, we load the point cloud and save it as a data frame, with the
+first three columns as the x, y, and z columns. We use the
+<code>plot_qsm()</code> function to do this. We want to check the raw
+cylinder fits before any possible modification, so we will will use the
+raw cylinder radii.</p>
+<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" tabindex="-1"></a><span class="co"># Load the input point cloud</span></span>
+<span id="cb11-2"><a href="#cb11-2" tabindex="-1"></a>file <span class="ot">&lt;-</span> <span class="fu">system.file</span>(<span class="st">&quot;extdata/cloud.txt&quot;</span>, <span class="at">package =</span> <span class="st">&quot;rTwig&quot;</span>)</span>
+<span id="cb11-3"><a href="#cb11-3" tabindex="-1"></a>cloud <span class="ot">&lt;-</span> <span class="fu">read.table</span>(file, <span class="at">header =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb11-4"><a href="#cb11-4" tabindex="-1"></a></span>
+<span id="cb11-5"><a href="#cb11-5" tabindex="-1"></a><span class="co"># Plot the qsm and point cloud</span></span>
+<span id="cb11-6"><a href="#cb11-6" tabindex="-1"></a><span class="fu">plot_qsm</span>(<span class="at">cylinder =</span> cylinder, <span class="at">cloud =</span> cloud, <span class="at">radius =</span> <span class="st">&quot;UnmodRadius&quot;</span>)</span></code></pre></div>
+</div>
+<div id="twig-diameters" class="section level2">
+<h2>Twig Diameters</h2>
+<p>Before we can correct the QSM radii, we need to know what our real
+twig diameter is. For this example tree, the species is a Kentucky
+coffee tree (<em>Gymnocladus dioicus</em>), which has nice, stout twigs.
+rTwig comes with a data base of twigs that can be called by typing in
+the <code>twigs</code> data set. The data set includes the average twig
+radius, the min and max radius, the standard deviation, and the
+coefficient of variation. Let’s look at the twig data set and find the
+twig diameter for Kentucky coffee tree.</p>
+<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" tabindex="-1"></a><span class="co"># Look at the twigs database</span></span>
+<span id="cb12-2"><a href="#cb12-2" tabindex="-1"></a>twigs</span>
+<span id="cb12-3"><a href="#cb12-3" tabindex="-1"></a><span class="co">#&gt; # A tibble: 102 × 7</span></span>
+<span id="cb12-4"><a href="#cb12-4" tabindex="-1"></a><span class="co">#&gt;    scientific_name  radius_mm     n   min   max   std    cv</span></span>
+<span id="cb12-5"><a href="#cb12-5" tabindex="-1"></a><span class="co">#&gt;    &lt;chr&gt;                &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;</span></span>
+<span id="cb12-6"><a href="#cb12-6" tabindex="-1"></a><span class="co">#&gt;  1 Abies concolor        1.43    21  0.89  1.9   0.28  0.19</span></span>
+<span id="cb12-7"><a href="#cb12-7" tabindex="-1"></a><span class="co">#&gt;  2 Abies spp.            1.43    21  0.89  1.9   0.28  0.19</span></span>
+<span id="cb12-8"><a href="#cb12-8" tabindex="-1"></a><span class="co">#&gt;  3 Acer platanoides      1.39    30  0.89  2.03  0.3   0.21</span></span>
+<span id="cb12-9"><a href="#cb12-9" tabindex="-1"></a><span class="co">#&gt;  4 Acer rubrum           1.18    30  0.89  1.52  0.16  0.14</span></span>
+<span id="cb12-10"><a href="#cb12-10" tabindex="-1"></a><span class="co">#&gt;  5 Acer saccharinum      1.41    14  0.89  1.9   0.27  0.2 </span></span>
+<span id="cb12-11"><a href="#cb12-11" tabindex="-1"></a><span class="co">#&gt;  6 Acer saccharum        1.2     30  0.89  1.65  0.23  0.19</span></span>
+<span id="cb12-12"><a href="#cb12-12" tabindex="-1"></a><span class="co">#&gt;  7 Acer spp.             1.29   104  0.89  2.03  0.23  0.18</span></span>
+<span id="cb12-13"><a href="#cb12-13" tabindex="-1"></a><span class="co">#&gt;  8 Aesculus flava        2.67     8  2.29  2.79  0.2   0.08</span></span>
+<span id="cb12-14"><a href="#cb12-14" tabindex="-1"></a><span class="co">#&gt;  9 Aesculus spp.         2.67     8  2.29  2.79  0.2   0.08</span></span>
+<span id="cb12-15"><a href="#cb12-15" tabindex="-1"></a><span class="co">#&gt; 10 Betula nigra          0.85    30  0.51  1.52  0.23  0.27</span></span>
+<span id="cb12-16"><a href="#cb12-16" tabindex="-1"></a><span class="co">#&gt; # ℹ 92 more rows</span></span>
+<span id="cb12-17"><a href="#cb12-17" tabindex="-1"></a></span>
+<span id="cb12-18"><a href="#cb12-18" tabindex="-1"></a><span class="co"># Find our species</span></span>
+<span id="cb12-19"><a href="#cb12-19" tabindex="-1"></a><span class="fu">filter</span>(twigs, scientific_name <span class="sc">==</span> <span class="st">&quot;Gymnocladus dioicus&quot;</span>)</span>
+<span id="cb12-20"><a href="#cb12-20" tabindex="-1"></a><span class="co">#&gt; # A tibble: 1 × 7</span></span>
+<span id="cb12-21"><a href="#cb12-21" tabindex="-1"></a><span class="co">#&gt;   scientific_name     radius_mm     n   min   max   std    cv</span></span>
+<span id="cb12-22"><a href="#cb12-22" tabindex="-1"></a><span class="co">#&gt;   &lt;chr&gt;                   &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;</span></span>
+<span id="cb12-23"><a href="#cb12-23" tabindex="-1"></a><span class="co">#&gt; 1 Gymnocladus dioicus      4.23    30  2.79   6.6  0.87   0.2</span></span></code></pre></div>
+</div>
+<div id="summary-metrics" class="section level2">
+<h2>Summary Metrics</h2>
+<p>Before we correct the QSM, Let’s take a look at the current metrics,
+so we can compare the tree volume before and after correction. We can do
+this with the <code>qsm_summary()</code> function. If stem triangulation
+was enabled in TreeQSM, we can use it to better represent the main stem
+volume in some cases, especially when there are large butress flares. We
+can also make a plot of the radius versus the growth length to see how
+much overestimation there is in the twig radii.</p>
+<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" tabindex="-1"></a><span class="co"># QSM summary</span></span>
+<span id="cb13-2"><a href="#cb13-2" tabindex="-1"></a><span class="fu">qsm_summary</span>(cylinder, <span class="at">radius =</span> <span class="st">&quot;unmodified&quot;</span>)[[<span class="dv">1</span>]]</span>
+<span id="cb13-3"><a href="#cb13-3" tabindex="-1"></a><span class="co">#&gt; # A tidytable: 6 × 3</span></span>
+<span id="cb13-4"><a href="#cb13-4" tabindex="-1"></a><span class="co">#&gt;   BranchOrder tree_volume_L tree_area_m2</span></span>
+<span id="cb13-5"><a href="#cb13-5" tabindex="-1"></a><span class="co">#&gt;         &lt;int&gt;         &lt;dbl&gt;        &lt;dbl&gt;</span></span>
+<span id="cb13-6"><a href="#cb13-6" tabindex="-1"></a><span class="co">#&gt; 1           0       10.8         0.644  </span></span>
+<span id="cb13-7"><a href="#cb13-7" tabindex="-1"></a><span class="co">#&gt; 2           1        5.80        0.827  </span></span>
+<span id="cb13-8"><a href="#cb13-8" tabindex="-1"></a><span class="co">#&gt; 3           2        3.86        0.732  </span></span>
+<span id="cb13-9"><a href="#cb13-9" tabindex="-1"></a><span class="co">#&gt; 4           3        1.06        0.237  </span></span>
+<span id="cb13-10"><a href="#cb13-10" tabindex="-1"></a><span class="co">#&gt; 5           4        0.622       0.0785 </span></span>
+<span id="cb13-11"><a href="#cb13-11" tabindex="-1"></a><span class="co">#&gt; 6           5        0.0346      0.00693</span></span>
+<span id="cb13-12"><a href="#cb13-12" tabindex="-1"></a></span>
+<span id="cb13-13"><a href="#cb13-13" tabindex="-1"></a><span class="co"># QSM summary with Triangulation</span></span>
+<span id="cb13-14"><a href="#cb13-14" tabindex="-1"></a><span class="fu">qsm_summary</span>(<span class="at">cylinder =</span> cylinder, <span class="at">triangulation =</span> qsm<span class="sc">$</span>triangulation, <span class="at">radius =</span> <span class="st">&quot;unmodified&quot;</span>)[[<span class="dv">1</span>]]</span>
+<span id="cb13-15"><a href="#cb13-15" tabindex="-1"></a><span class="co">#&gt; # A tidytable: 6 × 3</span></span>
+<span id="cb13-16"><a href="#cb13-16" tabindex="-1"></a><span class="co">#&gt;   BranchOrder tree_volume_L tree_area_m2</span></span>
+<span id="cb13-17"><a href="#cb13-17" tabindex="-1"></a><span class="co">#&gt;         &lt;int&gt;         &lt;dbl&gt;        &lt;dbl&gt;</span></span>
+<span id="cb13-18"><a href="#cb13-18" tabindex="-1"></a><span class="co">#&gt; 1           0       29.0         0.645  </span></span>
+<span id="cb13-19"><a href="#cb13-19" tabindex="-1"></a><span class="co">#&gt; 2           1        5.80        0.827  </span></span>
+<span id="cb13-20"><a href="#cb13-20" tabindex="-1"></a><span class="co">#&gt; 3           2        3.86        0.732  </span></span>
+<span id="cb13-21"><a href="#cb13-21" tabindex="-1"></a><span class="co">#&gt; 4           3        1.06        0.237  </span></span>
+<span id="cb13-22"><a href="#cb13-22" tabindex="-1"></a><span class="co">#&gt; 5           4        0.622       0.0785 </span></span>
+<span id="cb13-23"><a href="#cb13-23" tabindex="-1"></a><span class="co">#&gt; 6           5        0.0346      0.00693</span></span></code></pre></div>
+<p><img src="data:image/png;base64,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" style="display: block; margin: auto;" /></p>
+<p>Looking at the diagnostic plot on a log log scale, with the measured
+twig radius as the horizontal line, we can see that nearly all of the
+twig radii are overestimated, with increasing radii variation as the
+growth length approaches zero. Except for the main stem, there is not a
+very clear pattern in the individual branch tapering.</p>
+</div>
+<div id="correct-radii" class="section level2">
+<h2>Correct Radii</h2>
+<p>Now we can correct our QSM cylinder radii with the
+<code>correct_radii()</code> function. In this step, we model each path
+in the tree separately, where poorly fit cylinders are identified and
+removed, and a GAM is fit, where the intercept is the measured twig
+radius, and the growth length predicts the cylinder radius. Let’s
+correct the cylinder radii on our Kentucky coffee tree and look at the
+new volume estimates and diagnostic plots.</p>
+<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" tabindex="-1"></a><span class="co"># Correct cylinder radii</span></span>
+<span id="cb14-2"><a href="#cb14-2" tabindex="-1"></a>cylinder <span class="ot">&lt;-</span> <span class="fu">correct_radii</span>(cylinder, <span class="at">twig_radius =</span> <span class="fl">4.23</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" tabindex="-1"></a><span class="co"># Corrected QSM summary</span></span>
+<span id="cb15-2"><a href="#cb15-2" tabindex="-1"></a><span class="fu">qsm_summary</span>(cylinder, <span class="at">radius =</span> <span class="st">&quot;modified&quot;</span>)[[<span class="dv">1</span>]]</span>
+<span id="cb15-3"><a href="#cb15-3" tabindex="-1"></a><span class="co">#&gt; # A tidytable: 6 × 3</span></span>
+<span id="cb15-4"><a href="#cb15-4" tabindex="-1"></a><span class="co">#&gt;   BranchOrder tree_volume_L tree_area_m2</span></span>
+<span id="cb15-5"><a href="#cb15-5" tabindex="-1"></a><span class="co">#&gt;         &lt;int&gt;         &lt;dbl&gt;        &lt;dbl&gt;</span></span>
+<span id="cb15-6"><a href="#cb15-6" tabindex="-1"></a><span class="co">#&gt; 1           0      10.8          0.640  </span></span>
+<span id="cb15-7"><a href="#cb15-7" tabindex="-1"></a><span class="co">#&gt; 2           1       5.20         0.754  </span></span>
+<span id="cb15-8"><a href="#cb15-8" tabindex="-1"></a><span class="co">#&gt; 3           2       2.69         0.583  </span></span>
+<span id="cb15-9"><a href="#cb15-9" tabindex="-1"></a><span class="co">#&gt; 4           3       0.539        0.170  </span></span>
+<span id="cb15-10"><a href="#cb15-10" tabindex="-1"></a><span class="co">#&gt; 5           4       0.104        0.0431 </span></span>
+<span id="cb15-11"><a href="#cb15-11" tabindex="-1"></a><span class="co">#&gt; 6           5       0.00683      0.00308</span></span></code></pre></div>
+<p><img src="data:image/png;base64,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" style="display: block; margin: auto;" /></p>
+<p>Here we can see that we reduced the volume of the QSM by around 3
+liters, which is around a 15% overestimation in volume before
+correction. Kentucky coffee tree has relatively large twigs, so the
+overestimation is not as severe as a tree with much smaller twigs, that
+can have upwards of &gt;200% overestimation in some cases.</p>
+<p>Looking at the diagnostic plot, we can see that individual branches
+can clearly be identified by their unique allometry. Notice how nearly
+all of the volume reduction occurred in the higher order branches, with
+the main stem remaining nearly unchanged. The branches now taper towards
+the measured twig radius for Kentucky coffee tree. Getting the real twig
+diameter is critical, as too high a value will overestimate volume, and
+too low a value will underestimate total volume, with the over or
+underestimate being proportional to the number of twigs and small
+branches in the tree. If your species is not available in the database,
+we have found that the genus level twig radius average is a good
+substitute.</p>
+</div>
+<div id="visualization" class="section level2">
+<h2>Visualization</h2>
+<p>Optionally, we can smooth our QSM by ensuring all of the cylinders
+are connected. This is a visual change and does not affect the volume
+estimates. We can do this with the <code>smooth_qsm()</code> function,
+and plot the results with the <code>plot_qsm()</code> function. The
+different colors are the different branch orders. We can also color our
+QSM by many different variables and palettes. See the
+<code>plot_qsm()</code> documentation for more details.</p>
+<div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" tabindex="-1"></a><span class="co"># Smooth QSM</span></span>
+<span id="cb16-2"><a href="#cb16-2" tabindex="-1"></a>cylinder <span class="ot">&lt;-</span> <span class="fu">smooth_qsm</span>(cylinder)</span>
+<span id="cb16-3"><a href="#cb16-3" tabindex="-1"></a></span>
+<span id="cb16-4"><a href="#cb16-4" tabindex="-1"></a><span class="co"># Plot QSM</span></span>
+<span id="cb16-5"><a href="#cb16-5" tabindex="-1"></a><span class="fu">plot_qsm</span>(cylinder)</span>
+<span id="cb16-6"><a href="#cb16-6" tabindex="-1"></a></span>
+<span id="cb16-7"><a href="#cb16-7" tabindex="-1"></a><span class="co"># QSM Custom Colors &amp; Piping</span></span>
+<span id="cb16-8"><a href="#cb16-8" tabindex="-1"></a>cylinder <span class="sc">%&gt;%</span></span>
+<span id="cb16-9"><a href="#cb16-9" tabindex="-1"></a>  <span class="fu">plot_qsm</span>(</span>
+<span id="cb16-10"><a href="#cb16-10" tabindex="-1"></a>    <span class="at">radius =</span> <span class="st">&quot;radius&quot;</span>,</span>
+<span id="cb16-11"><a href="#cb16-11" tabindex="-1"></a>    <span class="at">cyl_color =</span> <span class="st">&quot;reverseBranchOrder&quot;</span>,</span>
+<span id="cb16-12"><a href="#cb16-12" tabindex="-1"></a>    <span class="at">cyl_palette =</span> <span class="st">&quot;magma&quot;</span></span>
+<span id="cb16-13"><a href="#cb16-13" tabindex="-1"></a>  )</span>
+<span id="cb16-14"><a href="#cb16-14" tabindex="-1"></a></span>
+<span id="cb16-15"><a href="#cb16-15" tabindex="-1"></a><span class="co"># Plot Twigs Colored by Unique Segment</span></span>
+<span id="cb16-16"><a href="#cb16-16" tabindex="-1"></a>cylinder <span class="sc">%&gt;%</span></span>
+<span id="cb16-17"><a href="#cb16-17" tabindex="-1"></a>  <span class="fu">filter</span>(reverseBranchOrder <span class="sc">==</span> <span class="dv">1</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb16-18"><a href="#cb16-18" tabindex="-1"></a>  <span class="fu">plot_qsm</span>(</span>
+<span id="cb16-19"><a href="#cb16-19" tabindex="-1"></a>    <span class="at">radius =</span> <span class="st">&quot;radius&quot;</span>,</span>
+<span id="cb16-20"><a href="#cb16-20" tabindex="-1"></a>    <span class="at">cyl_color =</span> <span class="st">&quot;reverseBranchOrder&quot;</span>,</span>
+<span id="cb16-21"><a href="#cb16-21" tabindex="-1"></a>    <span class="at">cyl_palette =</span> <span class="st">&quot;rainbow&quot;</span></span>
+<span id="cb16-22"><a href="#cb16-22" tabindex="-1"></a>  )</span></code></pre></div>
+<p>We can also save our QSM as a mesh (.ply extension) for use in other
+modeling programs with the <code>export_mesh()</code> function. The same
+colors and palettes found in the <code>plot_qsm()</code> function can be
+used to color the mesh.</p>
+<div class="sourceCode" id="cb17"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" tabindex="-1"></a><span class="co"># Export Mesh Colored by RBO</span></span>
+<span id="cb17-2"><a href="#cb17-2" tabindex="-1"></a>cylinder <span class="sc">%&gt;%</span></span>
+<span id="cb17-3"><a href="#cb17-3" tabindex="-1"></a>  <span class="fu">export_mesh</span>(</span>
+<span id="cb17-4"><a href="#cb17-4" tabindex="-1"></a>    <span class="at">filename =</span> <span class="st">&quot;QSM_mesh&quot;</span>,</span>
+<span id="cb17-5"><a href="#cb17-5" tabindex="-1"></a>    <span class="at">radius =</span> <span class="st">&quot;radius&quot;</span>,</span>
+<span id="cb17-6"><a href="#cb17-6" tabindex="-1"></a>    <span class="at">color =</span> <span class="st">&quot;reverseBranchOrder&quot;</span>,</span>
+<span id="cb17-7"><a href="#cb17-7" tabindex="-1"></a>    <span class="at">palette =</span> <span class="st">&quot;magma&quot;</span></span>
+<span id="cb17-8"><a href="#cb17-8" tabindex="-1"></a>  )</span>
+<span id="cb17-9"><a href="#cb17-9" tabindex="-1"></a></span>
+<span id="cb17-10"><a href="#cb17-10" tabindex="-1"></a><span class="co"># Export Twigs Colored by Unique Segments</span></span>
+<span id="cb17-11"><a href="#cb17-11" tabindex="-1"></a>cylinder <span class="sc">%&gt;%</span></span>
+<span id="cb17-12"><a href="#cb17-12" tabindex="-1"></a>  <span class="fu">filter</span>(reverseBranchOrder <span class="sc">==</span> <span class="dv">1</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb17-13"><a href="#cb17-13" tabindex="-1"></a>  <span class="fu">export_mesh</span>(</span>
+<span id="cb17-14"><a href="#cb17-14" tabindex="-1"></a>    <span class="at">filename =</span> <span class="st">&quot;QSM_mesh&quot;</span>,</span>
+<span id="cb17-15"><a href="#cb17-15" tabindex="-1"></a>    <span class="at">radius =</span> <span class="st">&quot;radius&quot;</span>,</span>
+<span id="cb17-16"><a href="#cb17-16" tabindex="-1"></a>    <span class="at">color =</span> <span class="st">&quot;reverseBranchOrder&quot;</span>,</span>
+<span id="cb17-17"><a href="#cb17-17" tabindex="-1"></a>    <span class="at">palette =</span> <span class="st">&quot;rainbow&quot;</span></span>
+<span id="cb17-18"><a href="#cb17-18" tabindex="-1"></a>  )</span></code></pre></div>
+</div>
+<div id="workflow-best-practices" class="section level2">
+<h2>Workflow &amp; Best Practices</h2>
+<p>Below is an overview of the typical rTwig processing chain. When
+dealing with multiple trees, we advise creating a master data frame in a
+tidy format, where each unique tree is a row, and the columns are the
+tree id, the directory to the QSM .mat file, and the species twig
+diameter, all of which can be tailored to your workflow needs. Then it
+is a simple matter of looping over the master data frame, correcting
+each tree, and saving the results to a master list. Make sure to read
+each function’s documentation for more examples and unique features.</p>
+<div class="sourceCode" id="cb18"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" tabindex="-1"></a><span class="co"># Import QSM</span></span>
+<span id="cb18-2"><a href="#cb18-2" tabindex="-1"></a>file <span class="ot">&lt;-</span> <span class="fu">system.file</span>(<span class="st">&quot;extdata/QSM.mat&quot;</span>, <span class="at">package =</span> <span class="st">&quot;rTwig&quot;</span>)</span>
+<span id="cb18-3"><a href="#cb18-3" tabindex="-1"></a></span>
+<span id="cb18-4"><a href="#cb18-4" tabindex="-1"></a><span class="co"># Real Twig Main Steps</span></span>
+<span id="cb18-5"><a href="#cb18-5" tabindex="-1"></a>cylinder <span class="ot">&lt;-</span> <span class="fu">run_rtwig</span>(file, <span class="at">twig_radius =</span> <span class="fl">4.23</span>)</span>
+<span id="cb18-6"><a href="#cb18-6" tabindex="-1"></a></span>
+<span id="cb18-7"><a href="#cb18-7" tabindex="-1"></a><span class="co"># Tree Metrics</span></span>
+<span id="cb18-8"><a href="#cb18-8" tabindex="-1"></a>metrics <span class="ot">&lt;-</span> <span class="fu">tree_metrics</span>(cylinder)</span>
+<span id="cb18-9"><a href="#cb18-9" tabindex="-1"></a></span>
+<span id="cb18-10"><a href="#cb18-10" tabindex="-1"></a><span class="co"># Plot Results</span></span>
+<span id="cb18-11"><a href="#cb18-11" tabindex="-1"></a><span class="fu">plot_qsm</span>(cylinder)</span></code></pre></div>
+</div>
+
+
+
+<!-- code folding -->
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

@@ -8,7 +8,7 @@ knitr::opts_chunk$set(
 #  install.packages("rTwig")
 
 ## ----echo=FALSE, warning=FALSE------------------------------------------------
-# Enable RGL Plot 
+# Enable RGL Plot
 library(rgl)
 
 ## ----eval=FALSE---------------------------------------------------------------
@@ -23,17 +23,17 @@ cloud <- read.table(file, header = FALSE)
 
 ## -----------------------------------------------------------------------------
 # Box Dimension Summary
-output <- box_dimension(cloud, lowercutoff = 0.005)
-output
+output <- box_dimension(cloud)
+str(output)
 
 # Box Dimension (slope)
 output[[2]]$slope
 
 ## ----fig.width=7, fig.height=5------------------------------------------------
 # 2D Plot
-output <- box_dimension(cloud, lowercutoff = 0.005, plot = "2D")
+output <- box_dimension(cloud, plot = "2D")
 
 ## ----webgl=TRUE, fig.width=7, fig.height=5, fig.align='center', eval=FALSE----
 #  # 3D Plot
-#  output <- box_dimension(cloud, lowercutoff = 0.005, plot = "3D")
+#  output <- box_dimension(cloud, plot = "3D")
 

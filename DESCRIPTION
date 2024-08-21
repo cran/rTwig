@@ -1,13 +1,14 @@
 Package: rTwig
 Title: Realistic Quantitative Structure Models
-Version: 1.0.2
+Version: 1.1.0
 Authors@R: 
   c(
     person(
       given = "Aidan", 
       family = "Morales", 
       email = "moral169@msu.edu", 
-      role = c("aut", "cre", "cph")
+      role = c("aut", "cre", "cph"),
+      comment = c(ORCID = "0009-0000-4513-4908")
     ),
     person(
       given = "David W.",    
@@ -16,26 +17,27 @@ Authors@R:
       role = c("aut", "cph")
     )
   )
-Description: Real Twig is a method to correct branch overestimation in quantitative structure models. Overestimated cylinders are correctly tapered using measured twig diameters of corresponding tree species. Supported quantitative structure modeling software includes 'TreeQSM' and 'SimpleForest'. Also included is a novel database of twig diameters and tools for fractal analysis of point clouds.
+Description: Real Twig is a method to correct branch overestimation in quantitative structure models. Overestimated cylinders are correctly tapered using measured twig diameters of corresponding tree species. Supported quantitative structure modeling software includes 'TreeQSM', 'SimpleForest' and 'Treegraph'. Also included is a novel database of twig diameters and tools for fractal analysis of point clouds.
 Encoding: UTF-8
-RoxygenNote: 7.3.1
+RoxygenNote: 7.3.2
 RdMacros: Rdpack
-Imports: igraph, R.matlab, tidytable, data.table, cobs, purrr, foreach,
-        future, doFuture, progressr, rgl, colourvalues, Morpho, Rdpack,
-        DescTools, kit, rmatio, Matrix (>= 1.6-3), randomcoloR
+Imports: R.matlab, rmatio, tidytable, cobs, igraph, future, foreach,
+        doFuture, progressr, rgl, colourvalues, Rdpack, rlang, Rcpp,
+        RcppSimdJson, geometry
 License: GPL (>= 3)
 Depends: R (>= 3.5.0)
 LazyData: true
 Suggests: knitr, rmarkdown, ggplot2, ggpmisc, ggpubr, gt, yardstick,
         dplyr, tidyr
 VignetteBuilder: knitr
-NeedsCompilation: no
-Packaged: 2024-04-05 22:33:15 UTC; moral169
-Author: Aidan Morales [aut, cre, cph],
-  David W. MacFarlane [aut, cph]
+NeedsCompilation: yes
+Packaged: 2024-08-20 21:09:33 UTC; moral169
 Maintainer: Aidan Morales <moral169@msu.edu>
 URL: https://aidanmorales.github.io/rTwig/,
         https://github.com/aidanmorales/rTwig
 BugReports: https://github.com/aidanmorales/rTwig/issues
+LinkingTo: Rcpp
+Author: Aidan Morales [aut, cre, cph] (<https://orcid.org/0009-0000-4513-4908>),
+  David W. MacFarlane [aut, cph]
 Repository: CRAN
-Date/Publication: 2024-04-08 15:00:02 UTC
+Date/Publication: 2024-08-21 00:50:02 UTC

@@ -26,13 +26,13 @@ library(ggplot2)
 rTwig::twigs
 
 ## -----------------------------------------------------------------------------
-unique(twigs$scientific.name)
+unique(twigs$scientific_name)
 
 ## ----fig.height=6, fig.width=7------------------------------------------------
 # Lets look at a subset of oak species
 twigs %>%
-  filter(grepl("Quercus", scientific.name)) %>%
-  ggplot(aes(x = scientific.name, y = radius.mm, color = scientific.name)) +
+  filter(grepl("Quercus", scientific_name)) %>%
+  ggplot(aes(x = scientific_name, y = radius_mm, color = scientific_name)) +
   geom_point(aes(size = n)) +
   geom_errorbar(aes(ymax = max, ymin = min)) +
   coord_flip() +

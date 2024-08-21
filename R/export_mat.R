@@ -8,10 +8,6 @@
 #' @return Returns a .mat file
 #' @export
 #'
-#' @importFrom Matrix as.matrix
-#' @importFrom R.matlab writeMat
-#' @rawNamespace import(tidytable, except=c(map_dfr))
-#'
 #' @examples
 #' \donttest{
 #'
@@ -31,23 +27,63 @@
 #'
 #' filename <- tempfile(pattern = "SimpleForest_QSM.mat")
 #' export_mat(cylinder, filename)
-#'
 #' }
 #'
 export_mat <- function(cylinder, filename) {
   message("Exporting to .mat")
 
-  # TreeQSM --------------------------------------------------------------------
-  if (all(c("parent", "extension", "branch", "BranchOrder") %in% colnames(cylinder))) {
+  # rTwig ----------------------------------------------------------------------
+  if (all(c("id", "parent", "start_x", "branch_order") %in% colnames(cylinder))) {
     radius <- as.matrix(cylinder$radius)
     length <- as.matrix(cylinder$length)
 
     start <- cylinder %>%
-      select(.data$start.x, .data$start.y, .data$start.z) %>%
+      select(start.x = "start_x", start.y = "start_y", start.z = "start_z") %>%
       as.matrix()
 
     axis <- cylinder %>%
-      select(.data$axis.x, .data$axis.y, .data$axis.z) %>%
+      select(axis.x = "axis_x", axis.y = "axis_y", axis.z = "axis_z") %>%
+      as.matrix()
+
+    parent <- as.matrix(cylinder$parent)
+    extension <- as.matrix(cylinder$id)
+    added <- NA
+    UnmodRadius <- as.matrix(cylinder$raw_radius)
+    branch <- as.matrix(cylinder$branch)
+    SurfCov <- NA
+    mad <- NA
+    BranchOrder <- as.matrix(cylinder$branch_order)
+    PositionInBranch <- as.matrix(cylinder$branch_position)
+
+    output <- list(
+      radius = radius,
+      length = length,
+      start = start,
+      axis = axis,
+      parent = parent,
+      extension = extension,
+      added = added,
+      UnmodRadius = UnmodRadius,
+      branch = branch,
+      SurfCov = SurfCov,
+      mad = mad,
+      BranchOrder = BranchOrder,
+      PositionInBranch = PositionInBranch
+    )
+
+    R.matlab::writeMat(filename, cylinder = output)
+  }
+  # TreeQSM --------------------------------------------------------------------
+  else if (all(c("parent", "extension", "branch", "BranchOrder") %in% colnames(cylinder))) {
+    radius <- as.matrix(cylinder$radius)
+    length <- as.matrix(cylinder$length)
+
+    start <- cylinder %>%
+      select("start.x", "start.y", "start.z") %>%
+      as.matrix()
+
+    axis <- cylinder %>%
+      select("axis.x", "axis.y", "axis.z") %>%
       as.matrix()
 
     parent <- as.matrix(cylinder$parent)
@@ -102,18 +138,18 @@ export_mat <- function(cylinder, filename) {
 
       R.matlab::writeMat(filename, cylinder = output)
     }
-
+  }
   # SimpleForest ---------------------------------------------------------------
-  } else if (all(c("ID", "parentID", "branchID", "branchOrder") %in% colnames(cylinder))) {
+  else if (all(c("ID", "parentID", "branchID", "branchOrder") %in% colnames(cylinder))) {
     radius <- as.matrix(cylinder$radius)
     length <- as.matrix(cylinder$length)
 
     start <- cylinder %>%
-      select(start.x = .data$startX, start.y = .data$startY, start.z = .data$startZ) %>%
+      select(start.x = "startX", start.y = "startY", start.z = "startZ") %>%
       as.matrix()
 
     axis <- cylinder %>%
-      select(axis.x = .data$axisX, axis.y = .data$axisY, axis.z = .data$axisZ) %>%
+      select(axis.x = "axisX", axis.y = "axisY", axis.z = "axisZ") %>%
       as.matrix()
 
     parent <- as.matrix(cylinder$parentID)
@@ -124,11 +160,48 @@ export_mat <- function(cylinder, filename) {
     SurfCov <- NA
     mad <- as.matrix(cylinder$averagePointDistance)
     BranchOrder <- as.matrix(cylinder$branchOrder)
-    PositionInBranch <- as.matrix(cylinder %>% group_by(.data$branchID) %>%
-      reframe(PositionInBranch = 1:n()) %>%
-      ungroup() %>%
-      select(.data$PositionInBranch) %>%
-      pull())
+    PositionInBranch <- as.matrix(cylinder$positionInBranch)
+
+    output <- list(
+      radius = radius,
+      length = length,
+      start = start,
+      axis = axis,
+      parent = parent,
+      extension = extension,
+      added = added,
+      UnmodRadius = UnmodRadius,
+      branch = branch,
+      SurfCov = SurfCov,
+      mad = mad,
+      BranchOrder = BranchOrder,
+      PositionInBranch = PositionInBranch
+    )
+
+    R.matlab::writeMat(filename, cylinder = output)
+  }
+  # Treegraph ------------------------------------------------------------------
+  else if (all(c("p1", "p2", "ninternode") %in% colnames(cylinder))) {
+    radius <- as.matrix(cylinder$radius)
+    length <- as.matrix(cylinder$length)
+
+    start <- cylinder %>%
+      select(start.x = "sx", start.y = "sy", start.z = "sz") %>%
+      as.matrix()
+
+    axis <- cylinder %>%
+      select(axis.x = "ax", axis.y = "ay", axis.z = "az") %>%
+      as.matrix()
+
+    parent <- as.matrix(cylinder$p2)
+    extension <- as.matrix(cylinder$p1)
+    added <- NA
+    UnmodRadius <- as.matrix(cylinder$UnmodRadius)
+    branch <- as.matrix(cylinder$nbranch)
+    SurfCov <- NA
+    mad <- NA
+    BranchOrder <- as.matrix(cylinder$branch_order)
+    PositionInBranch <- as.matrix(cylinder$positionInBranch)
 
     output <- list(
       radius = radius,
@@ -150,7 +223,7 @@ export_mat <- function(cylinder, filename) {
   } else {
     message(
       "Invalid Dataframe Supplied!!!
-      \nOnly TreeQSM or SimpleForest QSMs are supported.
+      \nOnly TreeQSM, SimpleForest, or Treegraph QSMs are supported.
       \nMake sure the cylinder data frame and not the QSM list is supplied."
     )
   }

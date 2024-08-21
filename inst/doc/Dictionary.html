@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+
+
+
+<title>Dictionary</title>
+
+<script>// Pandoc 2.9 adds attributes on both header and div. We remove the former (to
+// be compatible with the behavior of Pandoc < 2.8).
+document.addEventListener('DOMContentLoaded', function(e) {
+  var hs = document.querySelectorAll("div.section[class*='level'] > :first-child");
+  var i, h, a;
+  for (i = 0; i < hs.length; i++) {
+    h = hs[i];
+    if (!/^h[1-6]$/i.test(h.tagName)) continue;  // it should be a header h1-h6
+    a = h.attributes;
+    while (a.length > 0) h.removeAttribute(a[0].name);
+  }
+});
+</script>
+
+<style type="text/css">
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+span.underline{text-decoration: underline;}
+div.column{display: inline-block; vertical-align: top; width: 50%;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+</style>
+
+
+
+
+
+
+
+<style type="text/css">body {
+background-color: #fff;
+margin: 1em auto;
+max-width: 700px;
+overflow: visible;
+padding-left: 2em;
+padding-right: 2em;
+font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+font-size: 14px;
+line-height: 1.35;
+}
+#TOC {
+clear: both;
+margin: 0 0 10px 10px;
+padding: 4px;
+width: 400px;
+border: 1px solid #CCCCCC;
+border-radius: 5px;
+background-color: #f6f6f6;
+font-size: 13px;
+line-height: 1.3;
+}
+#TOC .toctitle {
+font-weight: bold;
+font-size: 15px;
+margin-left: 5px;
+}
+#TOC ul {
+padding-left: 40px;
+margin-left: -1.5em;
+margin-top: 5px;
+margin-bottom: 5px;
+}
+#TOC ul ul {
+margin-left: -2em;
+}
+#TOC li {
+line-height: 16px;
+}
+table {
+margin: 1em auto;
+border-width: 1px;
+border-color: #DDDDDD;
+border-style: outset;
+border-collapse: collapse;
+}
+table th {
+border-width: 2px;
+padding: 5px;
+border-style: inset;
+}
+table td {
+border-width: 1px;
+border-style: inset;
+line-height: 18px;
+padding: 5px 5px;
+}
+table, table th, table td {
+border-left-style: none;
+border-right-style: none;
+}
+table thead, table tr.even {
+background-color: #f7f7f7;
+}
+p {
+margin: 0.5em 0;
+}
+blockquote {
+background-color: #f6f6f6;
+padding: 0.25em 0.75em;
+}
+hr {
+border-style: solid;
+border: none;
+border-top: 1px solid #777;
+margin: 28px 0;
+}
+dl {
+margin-left: 0;
+}
+dl dd {
+margin-bottom: 13px;
+margin-left: 13px;
+}
+dl dt {
+font-weight: bold;
+}
+ul {
+margin-top: 0;
+}
+ul li {
+list-style: circle outside;
+}
+ul ul {
+margin-bottom: 0;
+}
+pre, code {
+background-color: #f7f7f7;
+border-radius: 3px;
+color: #333;
+white-space: pre-wrap; 
+}
+pre {
+border-radius: 3px;
+margin: 5px 0px 10px 0px;
+padding: 10px;
+}
+pre:not([class]) {
+background-color: #f7f7f7;
+}
+code {
+font-family: Consolas, Monaco, 'Courier New', monospace;
+font-size: 85%;
+}
+p > code, li > code {
+padding: 2px 0px;
+}
+div.figure {
+text-align: center;
+}
+img {
+background-color: #FFFFFF;
+padding: 2px;
+border: 1px solid #DDDDDD;
+border-radius: 3px;
+border: 1px solid #CCCCCC;
+margin: 0 5px;
+}
+h1 {
+margin-top: 0;
+font-size: 35px;
+line-height: 40px;
+}
+h2 {
+border-bottom: 4px solid #f7f7f7;
+padding-top: 10px;
+padding-bottom: 2px;
+font-size: 145%;
+}
+h3 {
+border-bottom: 2px solid #f7f7f7;
+padding-top: 10px;
+font-size: 120%;
+}
+h4 {
+border-bottom: 1px solid #f7f7f7;
+margin-left: 8px;
+font-size: 105%;
+}
+h5, h6 {
+border-bottom: 1px solid #ccc;
+font-size: 105%;
+}
+a {
+color: #0033dd;
+text-decoration: none;
+}
+a:hover {
+color: #6666ff; }
+a:visited {
+color: #800080; }
+a:visited:hover {
+color: #BB00BB; }
+a[href^="http:"] {
+text-decoration: underline; }
+a[href^="https:"] {
+text-decoration: underline; }
+
+code > span.kw { color: #555; font-weight: bold; } 
+code > span.dt { color: #902000; } 
+code > span.dv { color: #40a070; } 
+code > span.bn { color: #d14; } 
+code > span.fl { color: #d14; } 
+code > span.ch { color: #d14; } 
+code > span.st { color: #d14; } 
+code > span.co { color: #888888; font-style: italic; } 
+code > span.ot { color: #007020; } 
+code > span.al { color: #ff0000; font-weight: bold; } 
+code > span.fu { color: #900; font-weight: bold; } 
+code > span.er { color: #a61717; background-color: #e3d2d2; } 
+</style>
+
+
+
+
+</head>
+
+<body>
+
+
+
+
+<h1 class="title toc-ignore">Dictionary</h1>
+
+
+
+<div id="background" class="section level2">
+<h2>Background</h2>
+<p>Real Twig allows QSM variable names to be standardized across
+TreeQSM, SimpleForest, and Treegraph. This is done with the
+<code>standardize_qsm()</code> function, and creates a more consistent
+experience when working with QSMs. Below are detailed definitions of the
+variable names using the rTwig QSM format.</p>
+</div>
+<div id="dictionary" class="section level2">
+<h2>Dictionary</h2>
+<div id="cylinder-attributes" class="section level4">
+<h4>Cylinder Attributes</h4>
+<p><strong><code>start:</code></strong> This defines the x, y, z
+coordinates at the center of the cylinder’s base.</p>
+<p><strong><code>axis:</code></strong> This defines the x, y, z axis
+formed between the cylinder’s base and top.</p>
+<p><strong><code>end:</code></strong> This defines the x, y, z
+coordinates at the center of the cylinder’s top.</p>
+<p><strong><code>id:</code></strong> The first cylinder id is 1 and is
+the base of the tree. The largest id value is equal to the number of
+rows in the data frame.</p>
+<p><strong><code>parent:</code></strong> This shows the relationships
+between individual cylinders in the QSM. The parent of the first
+cylinder is always zero, because the base of the tree has no parent.
+Within a branch, parent cylinders are always one less than their child.
+At the base of a branch, the parent cylinder is the cylinder the branch
+is connected to.</p>
+<p><strong><code>radius:</code></strong> This is the radius of the
+cylinder in meters.</p>
+<p><strong><code>raw_radius:</code></strong> This is the radius of the
+cylinder before any possible modifications. If using TreeQSM, this is
+always the <em>UnmodRadius</em> column. If using SimpleForest or
+Treegraph, this is a copy of the radius before Real Twig is run. Real
+Twig always uses this radius in its corrections.</p>
+<p><strong><code>length:</code></strong> This is the length of the
+cylinder in meters.</p>
+</div>
+<div id="branch-attributes" class="section level4">
+<h4>Branch Attributes</h4>
+<p><strong><code>branch:</code></strong> A branch is defined as starting
+at a new branch order and continuing until a twig is reached. This
+definition is what TreeQSM and Treegraph use. SimpleForest branches are
+converted to this definition when standardizing the QSM. The first
+branch is always the main stem under the rTwig format. Treegraph QSMs
+retain their definition of branches. TreeQSM and SimpleForest are
+numbered consecutively in order of the cylinder ids.</p>
+<p><strong><code>branch_position:</code></strong> This is an index of
+the cylinder’s position within a branch. This is the same as TreeQSM’s
+<em>PositionInBranch</em> definition. The first position is always the
+base of the branch, and the last position is always a twig or the branch
+end in the case of a broken branch.</p>
+<p><strong><code>branch_order:</code></strong> This is the order of
+every branch. The smallest branch order zero is always the main stem.
+First order branches are connected to the main stem, and so on a so
+forth for higher order branches. A new branch order always begins at a
+new branching fork, continues to a twig or end of a broken branch, and
+is one greater than the parent order. This definition is consistent
+between TreeQSM, SimpleForest, and Treegraph, but the rTwig format
+always defines the main stem as order zero for consistency.</p>
+<p><strong><code>reverse_order:</code></strong> This is the reverse
+branch order (RBO). Traditional branch ordering is relative to the main
+stem, and does not tell us anything about the position or size of the
+branch. Small twigs and large branches can both be first order branches
+if they are connected to the main stem under the traditional definition.
+RBO solves this problem by considering the relative position of branches
+within a QSM. RBO assigns a value of one at the end of twigs or broken
+branches, and works backwards until the base of the tree is reached,
+which is assigned the highest RBO. The RBO of any branch is the maximum
+segment (internode) depth relative to the twigs in a tree.</p>
+<p><strong><code>branch_alt:</code></strong> This is the alternate
+branch index. Alternate branch zero is always the main stem. The rest of
+the branches are first order branches and all of their children. This is
+similar to cutting the first order branches off with a saw and labeling
+them consecutively. If using a SimpleForest QSM, this is the old
+<em>branchID</em> column updated so that the main stem is index
+zero.</p>
+</div>
+<div id="segment-attributes" class="section level4">
+<h4>Segment Attributes</h4>
+<p><strong><code>segment:</code></strong> A segment (internode) is a
+portion of a tree between branching forks (nodes). A new segment begins
+at every branch fork. Cylinders are a part of a segment until the
+cylinder has more than one child and a new segment is created. The rTwig
+format always defines the base of the tree as the first segment.</p>
+<p><strong><code>parent_segment:</code></strong> This shows the
+relationships between segments in the QSM. The parent segment of the
+first segment is always zero, because the first segment (the base of the
+tree) has no parent segment. The parent segment is the node the current
+segment forked from.</p>
+<p><strong><code>total_children:</code></strong> This is the total
+number of cylinders supported by the given cylinder. This is useful to
+find where branches fork. A value of one means that there are no
+branching forks. A value of two means that there is one branching fork,
+etc.</p>
+</div>
+<div id="additional-metrics" class="section level4">
+<h4>Additional Metrics</h4>
+<p><strong><code>growth_length:</code></strong> This is the growth
+length in meters of any given cylinder. Growth length can be defined as
+the sum of the lengths of the cylinders supported by the given cylinder.
+We can visualize growth length by cutting a tree with a saw at any given
+point. The cumulative length of this cut portion is the growth length
+where the part of the tree was cut. The growth length of the base of the
+tree is the sum of the lengths of all the cylinders in the QSM. The
+growth length of a twig is simply the length of its cylinder. Growth
+length reflects a measurement that could be taken on a real tree, but is
+easier to obtain with QSMs.</p>
+<p><strong><code>base_distance:</code></strong> This is the distance in
+meters of any given cylinder from the base of the tree. This distance is
+calculated by taking the simplest complete path from the given cylinder
+to the base of the tree.</p>
+<p><strong><code>twig_distance:</code></strong> This is the average
+distance in meters a given cylinder is away from all supported twigs.
+This is calculated by finding all complete simple paths from the given
+cylinder to the supported twigs, summing the lengths, and then dividing
+by the number of paths.</p>
+</div>
+</div>
+
+
+
+<!-- code folding -->
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>
