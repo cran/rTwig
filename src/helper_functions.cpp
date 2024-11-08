@@ -22,7 +22,6 @@ NumericVector cross_product(NumericVector a, NumericVector b) {
 }
 
 
-
 //' @title Norm
 //'
 //' @description Calculates the norm of a 1 x 3 vector
@@ -36,7 +35,6 @@ NumericVector cross_product(NumericVector a, NumericVector b) {
 double norm(NumericVector x) {
   return std::sqrt(std::pow(x[0], 2) + std::pow(x[1], 2) + std::pow(x[2], 2));
 }
-
 
 
 //' @title Orthonormal Vectors
@@ -66,7 +64,6 @@ List orthonormal_vectors(NumericVector U) {
 
   return List::create(Named("V") = V, Named("W") = W);
 }
-
 
 
 //' @title Rotation matrix
@@ -104,7 +101,6 @@ NumericMatrix rotation_matrix(NumericVector A, double angle) {
 
   return R;
 }
-
 
 
 //' @title Matrix Vector Subtraction
@@ -166,7 +162,6 @@ NumericMatrix mat_multiplication(NumericMatrix A, NumericMatrix B) {
 }
 
 
-
 //' @title Index Order
 //'
 //' @description Get order of sorted vector indexes
@@ -186,14 +181,13 @@ IntegerVector index_order(NumericVector x) {
 }
 
 
-
 //' @title Sort Index
 //'
 //' @description Sort a vector by a specified order
 //'
 //' @param v vector with dimensions 1 x n
 //' @param indexes integer vector with desired ordering
-//' @return vector
+//' @return NumericVector
 //'
 //' @noRd
 //'
@@ -204,4 +198,25 @@ NumericVector sort_index(NumericVector x, IntegerVector indexes) {
     sorted[i] = x[indexes[i]];
   }
   return sorted;
+}
+
+
+//' @title Which Rcpp
+//'
+//' @description Find the indices where a condition is true
+//'
+//' @param condition logical vector
+//' @return integer vector
+//'
+//' @noRd
+//'
+// [[Rcpp::export]]
+IntegerVector which_rcpp(LogicalVector condition) {
+  IntegerVector indices;
+  for (int i = 0; i < condition.size(); i++) {
+    if (condition[i]) {
+      indices.push_back(i);
+    }
+  }
+  return indices;
 }

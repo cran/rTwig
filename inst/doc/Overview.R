@@ -89,10 +89,10 @@ filter(twigs, scientific_name == "Gymnocladus dioicus")
 
 ## ----message = FALSE----------------------------------------------------------
 # QSM summary
-qsm_summary(cylinder, radius = "unmodified")[[1]]
+qsm_summary(cylinder = cylinder, radius = radius)[[1]]
 
 # QSM summary with Triangulation
-qsm_summary(cylinder = cylinder, triangulation = qsm$triangulation, radius = "unmodified")[[1]]
+qsm_summary(cylinder = cylinder, radius = radius, triangulation = qsm$triangulation)[[1]]
 
 ## ----echo=FALSE, fig.width = 7, fig.height = 4, fig.align='center'------------
 # Diagnostic Plot 1
@@ -117,7 +117,7 @@ cylinder <- correct_radii(cylinder, twig_radius = 4.23)
 
 ## ----r, message = FALSE-------------------------------------------------------
 # Corrected QSM summary
-qsm_summary(cylinder, radius = "modified")[[1]]
+qsm_summary(cylinder, radius = radius)[[1]]
 
 ## ----echo=FALSE, fig.width = 7, fig.height = 4, fig.align='center'------------
 # Diagnostic Plot 1
@@ -192,8 +192,4 @@ cylinder %>%
 #  
 #  # Plot Results
 #  plot_qsm(cylinder)
-
-## ----echo=FALSE, warning=FALSE, message=FALSE---------------------------------
-# Future Package Cleanup
-future::plan("sequential")
 

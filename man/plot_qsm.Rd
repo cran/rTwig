@@ -5,82 +5,94 @@
 \title{Plot QSM}
 \usage{
 plot_qsm(
-  cylinder,
+  cylinder = NULL,
   radius = NULL,
   color = NULL,
   palette = NULL,
+  alpha = 1,
   facets = 6,
+  skeleton = FALSE,
+  skeleton_lwd = NULL,
   cloud = NULL,
   pt_color = NULL,
   pt_size = NULL,
+  triangulation = NULL,
+  tri_color = NULL,
+  tri_palette = NULL,
   axes = TRUE,
+  axes_color = NULL,
+  grid = FALSE,
+  grid_color = NULL,
   hover = FALSE,
-  skeleton = FALSE,
-  bg_color = NULL
+  bg_color = NULL,
+  lit = TRUE,
+  pan = TRUE,
+  normalize = FALSE
 )
 }
 \arguments{
-\item{cylinder}{QSM cylinder data frame}
+\item{cylinder}{A QSM cylinder data frame.}
 
-\item{radius}{Column name of radii as a quoted string. Defaults to the modified radii.}
+\item{radius}{Radius column name either quoted or unquoted. Defaults to the modified radii.}
 
-\item{color}{Optional cylinder color parameter. Colors must be a single hex color, a vector of hex colors, or a quoted column name. It can also be set to "random" to generate a random solid color. Vectors must have the same length as the cylinder data frame.}
+\item{color}{Optional cylinder color parameter. Colors must be a single hex color string, a grDevices::colors(), a vector of hex colors, or a quoted/unquoted column name. It can also be set to "random" to generate a random solid color, or FALSE to disable color on export. Vectors must have the same length as the cylinder data frame.}
 
-\item{palette}{Optional color palette for numerical data. Palettes include: viridis, inferno, plasma, magma, cividis, and rainbow.}
+\item{palette}{Optional color palette for numerical data. Palettes include colourvalues::color_palettes() or a user supplied RGB palette matrix with the length of cylinder.}
+
+\item{alpha}{Set the transparency of the cylinders. Defaults to 1. 1 is opaque and 0 is fully transparent.}
 
 \item{facets}{The number of facets in the polygon cross section. Defaults to 6, but can be increased to improve visual smoothness at the cost of performance and memory.}
 
+\item{skeleton}{Plot the QSM skeleton instead of cylinders. Defaults to FALSE.}
+
+\item{skeleton_lwd}{Skeleton line width. Defaults to 1.}
+
 \item{cloud}{Point cloud data frame where the first three columns are the x, y, and z coordinates in the same coordinate system as the QSM. Defaults to NULL.}
 
-\item{pt_color}{Color of the point cloud. Defaults to black. Can be set to "random".}
+\item{pt_color}{Color of the point cloud. Accepts hex colors, grDevices::colors(), or "random". Defaults to black.}
 
 \item{pt_size}{Size of the points. Defaults to 0.1.}
 
+\item{triangulation}{Plot the stem triangulation mesh from TreeQSM. Defaults to NULL.}
+
+\item{tri_color}{Color of the triangulation mesh. Colors must be a single hex color.}
+
+\item{tri_palette}{Optional triangulation color palette for z values. Supports the same inputs as palettes.}
+
 \item{axes}{Show plot axes. Defaults to TRUE.}
+
+\item{axes_color}{Set the axes color. Defaults to black.}
+
+\item{grid}{Show plot grid lines. Defaults to FALSE.}
+
+\item{grid_color}{Set grid lines color. Defaults to grey.}
 
 \item{hover}{Show cylinder and branch id on mouse hover. Defaults to FALSE.}
 
-\item{skeleton}{Plot the QSM skeleton instead of cylinders. Defaults to FALSE.}
+\item{bg_color}{Set the background color of the plot. Accepts hex colors or grDevices::colors(). Defaults to white.}
 
-\item{bg_color}{Set the background color of the rgl plot. Defaults to NULL.}
+\item{lit}{Enable light source in plot. Defaults to TRUE. Can be set to FALSE.}
+
+\item{pan}{Use right mouse button to pan plot. Defaults to TRUE, but is disabled when hover is enabled.}
+
+\item{normalize}{Normalize the QSM to 0,0,0 based on the provided data. Defaults to FALSE.}
 }
 \value{
 A rgl plot
 }
 \description{
-Plots QSM cylinders and point clouds using the rgl library
+Efficiently plot QSMs and point clouds. Uses the Rcpp and RGL libraries as backends.
 }
 \examples{
 
-## TreeQSM Processing Chain
+## TreeQSM Processing Chain & Triangulation
 file <- system.file("extdata/QSM.mat", package = "rTwig")
 qsm <- import_qsm(file)
 cylinder <- qsm$cylinder
 cylinder <- update_cylinders(cylinder)
 plot_qsm(cylinder)
 
-## SimpleForest Processing Chain
-file <- system.file("extdata/QSM.csv", package = "rTwig")
-cylinder2 <- read.csv(file)
-cylinder2 <- update_cylinders(cylinder2)
-plot_qsm(cylinder2)
-
-## All Parameters
-file2 <- system.file("extdata/cloud.txt", package = "rTwig")
-cloud <- read.table(file2, header = FALSE)
-
-plot_qsm(
-  cylinder,
-  radius = "UnmodRadius",
-  color = "growthLength",
-  palette = "viridis",
-  facets = 100,
-  cloud = cloud,
-  pt_color = "random",
-  pt_size = 1,
-  axes = FALSE,
-  hover = TRUE,
-  bg_color = "black"
-)
+triangulation <- qsm$triangulation
+plot_qsm(triangulation = triangulation)
 
 }

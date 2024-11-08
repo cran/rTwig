@@ -5,26 +5,22 @@
 #' @import rgl
 #' @import rlang
 #' @import tidytable
+#' @import Rdpack
+#' @import Rcpp
 #' @importFrom cobs cobs
 #' @importFrom colourvalues color_values
-#' @importFrom doFuture %dofuture%
-#' @importFrom foreach foreach
-#' @importFrom future availableCores
-#' @importFrom future plan
 #' @importFrom geometry convhulln
 #' @importFrom graphics abline
 #' @importFrom graphics text
 #' @importFrom igraph all_simple_paths
 #' @importFrom igraph as_ids
-#' @importFrom igraph clusters
+#' @importFrom igraph components
 #' @importFrom igraph degree
 #' @importFrom igraph graph_from_data_frame
 #' @importFrom igraph V
 #' @importFrom igraph vcount
-#' @importFrom progressr handlers
 #' @importFrom R.matlab readMat
 #' @importFrom R.matlab writeMat
-#' @importFrom Rcpp sourceCpp
 #' @importFrom RcppSimdJson fload
 #' @importFrom RcppSimdJson fparse
 #' @importFrom Rdpack reprompt

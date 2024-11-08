@@ -19,11 +19,11 @@ export_mesh(
 
 \item{filename}{File name and path for exporting. The .ply extension is automatically added if not present.}
 
-\item{radius}{Vector of cylinder radii. Defaults to modified cylinders from the cylinder data frame.}
+\item{radius}{Radius column name either quoted or unquoted. Defaults to modified cylinders from the cylinder data frame.}
 
-\item{color}{Optional cylinder color parameter. Colors must be a single hex color, a vector of hex colors, or a quoted column name. It can also be set to "random" to generate a random solid color, or FALSE to disable color on export. Vectors must have the same length as the cylinder data frame.}
+\item{color}{Optional cylinder color parameter. Colors must be a single hex color string, a grDevices::colors(), a vector of hex colors, or a quoted/unquoted column name. It can also be set to "random" to generate a random solid color, or FALSE to disable color on export. Vectors must have the same length as the cylinder data frame.}
 
-\item{palette}{Optional color palette for numerical data. Palettes include: viridis, inferno, plasma, magma, cividis, and rainbow.}
+\item{palette}{Optional color palette for numerical data. Palettes include colourvalues::color_palettes() or a user supplied RGB palette matrix with the length of cylinder.}
 
 \item{facets}{The number of facets in the polygon cross section. Defaults to 6, but can be increased to improve visual smoothness at the cost of performance and memory.}
 
@@ -43,26 +43,15 @@ qsm <- import_qsm(file)
 cylinder <- qsm$cylinder
 cylinder <- update_cylinders(cylinder)
 
-filename <- tempfile(pattern = "QSM_mesh")
+filename <- tempfile(pattern = "TreeQSM_mesh")
 export_mesh(cylinder, filename)
 
 ## SimpleForest Processing Chain
 file <- system.file("extdata/QSM.csv", package = "rTwig")
-cylinder2 <- read.csv(file)
-cylinder2 <- update_cylinders(cylinder2)
+cylinder <- read.csv(file)
+cylinder <- update_cylinders(cylinder)
 
-filename2 <- tempfile(pattern = "QSM_mesh2")
-export_mesh(cylinder2, filename2)
-
-## All Parameters
-
-filename3 <- tempfile(pattern = "QSM_mesh3")
-export_mesh(
-  cylinder = cylinder,
-  filename = filename3,
-  radius = "UnmodRadius",
-  color = "growthLength",
-  palette = "viridis"
-)
+filename <- tempfile(pattern = "SimpleForest_mesh")
+export_mesh(cylinder, filename)
 
 }

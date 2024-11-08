@@ -18,7 +18,6 @@ Returns a .mat file
 Exports the cylinder data to be visualized with TreeQSM's plot_cylinder_model() function
 }
 \examples{
-\donttest{
 
 ## TreeQSM Processing Chain
 file <- system.file("extdata/QSM.mat", package = "rTwig")
@@ -26,7 +25,7 @@ qsm <- import_qsm(file)
 cylinder <- qsm$cylinder
 cylinder <- update_cylinders(cylinder)
 
-filename <- tempfile(pattern = "TreeQSM_QSM.mat")
+filename <- tempfile(pattern = "TreeQSM_QSM", fileext = ".mat")
 export_mat(cylinder, filename)
 
 ## SimpleForest Processing Chain
@@ -34,8 +33,7 @@ file <- system.file("extdata/QSM.csv", package = "rTwig")
 cylinder <- read.csv(file)
 cylinder <- update_cylinders(cylinder)
 
-filename <- tempfile(pattern = "SimpleForest_QSM.mat")
+filename <- tempfile(pattern = "SimpleForest_QSM", fileext = ".mat")
 export_mat(cylinder, filename)
-}
 
 }

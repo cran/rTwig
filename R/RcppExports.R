@@ -5,6 +5,10 @@ box_counting <- function(cloud, lowercutoff) {
     .Call(`_rTwig_box_counting`, cloud, lowercutoff)
 }
 
+assign_cloud_ids <- function(cloud_ref, cloud) {
+    .Call(`_rTwig_assign_cloud_ids`, cloud_ref, cloud)
+}
+
 #' @title Generate random colors
 #'
 #' @description Generates random hex colors
@@ -55,6 +59,64 @@ convex_hull <- function(points) {
 #'
 convex_hull_area <- function(points) {
     .Call(`_rTwig_convex_hull_area`, points)
+}
+
+#' @title IQR Filter
+#'
+#' @description Filter cylinder outliers
+#'
+#' @param x NumericVector
+#' @param method int
+#' @return IntegerVector
+#'
+#' @noRd
+#'
+iqr_filter <- function(x, method) {
+    .Call(`_rTwig_iqr_filter`, x, method)
+}
+
+#' @title Taper Filter
+#'
+#' @description Taper filter for QSM paths
+#'
+#' @param radius NumericVector cylinder radius
+#' @param taper int taper method
+#' @return IntegerVector
+#'
+#' @noRd
+#'
+taper_filter <- function(radius, taper) {
+    .Call(`_rTwig_taper_filter`, radius, taper)
+}
+
+#' @title Broken Branch Filter
+#'
+#' @description Find broken branches and prepare the paths for modeling.
+#' Broken branches have <= 1 child branch in the 1st order branches.
+#'
+#' @param path a path DataFrame
+#' @param twig_radius the twig radius in meters as a double
+#' @param broken_branch boolean to enable or disable the filter
+#' @return List
+#'
+#' @noRd
+#'
+broken_branch_filter <- function(path, twig_radius, broken_branch) {
+    .Call(`_rTwig_broken_branch_filter`, path, twig_radius, broken_branch)
+}
+
+#' @title Model Matrix
+#'
+#' @description Generate constraint the matrix for the cobs GAM
+#'
+#' @param min_growth_length min growth length as a double
+#' @param twig_radius the twig radius in meters as a double
+#' @return NumericMatrix
+#'
+#' @noRd
+#'
+model_matrix <- function(min_growth_length, twig_radius) {
+    .Call(`_rTwig_model_matrix`, min_growth_length, twig_radius)
 }
 
 #' @title Generate Circle Points
@@ -118,8 +180,8 @@ generate_mesh <- function(start, axis, length, radius, facets) {
 #'
 #' @noRd
 #'
-generate_cloud <- function(start, axis, tips, length, radius, branch) {
-    .Call(`_rTwig_generate_cloud`, start, axis, tips, length, radius, branch)
+generate_cloud <- function(start, axis, tips, length, radius, branch, metrics, spacing) {
+    .Call(`_rTwig_generate_cloud`, start, axis, tips, length, radius, branch, metrics, spacing)
 }
 
 #' @title Cross Product
@@ -224,12 +286,115 @@ index_order <- function(x) {
 #'
 #' @param v vector with dimensions 1 x n
 #' @param indexes integer vector with desired ordering
-#' @return vector
+#' @return NumericVector
 #'
 #' @noRd
 #'
 sort_index <- function(x, indexes) {
     .Call(`_rTwig_sort_index`, x, indexes)
+}
+
+#' @title Which Rcpp
+#'
+#' @description Find the indices where a condition is true
+#'
+#' @param condition logical vector
+#' @return integer vector
+#'
+#' @noRd
+#'
+which_rcpp <- function(condition) {
+    .Call(`_rTwig_which_rcpp`, condition)
+}
+
+#' @title Normalize View
+#'
+#' @description Normalizes RGL plot view
+#'
+#' @param x NumericVector x coordinate
+#' @param y NumericVector y coordinate
+#' @param z NumericVector z coordinate
+#' @param viewport NumericVector from RGL
+#' @return Numeric Matrix
+#'
+#' @noRd
+#'
+normalize_view <- function(x, y, z, viewport) {
+    .Call(`_rTwig_normalize_view`, x, y, z, viewport)
+}
+
+#' @title Solve and Transpose
+#'
+#' @description Solves and transposes RGL view matrices
+#'
+#' @param proj NumericMatrix from rgl.projection function
+#' @param model NumericMatrix from rgl.projection function
+#' @param normalized NumericMatrix from normalize_view function
+#' @return Numeric Matrix
+#'
+#' @noRd
+#'
+solve_and_transpose <- function(proj, model, normalized) {
+    .Call(`_rTwig_solve_and_transpose`, proj, model, normalized)
+}
+
+#' @title As Euclidean
+#'
+#' @description Rcpp port of RGL's asEuclidean function.
+#' Converts n x 4 matrix to n x 3 euclidean matrix.
+#'
+#' @param x NumericMatrix
+#' @return Numeric Matrix
+#'
+#' @noRd
+#'
+as_euclidean <- function(x) {
+    .Call(`_rTwig_as_euclidean`, x)
+}
+
+#' @title RGL Window to User
+#'
+#' @description Rcpp port of RGL's rgl.window2user function
+#'
+#' @param x NumericVector x coordinate
+#' @param y NumericVector y coordinate
+#' @param z NumericVector z coordinate
+#' @param projection List from RGL rgl.projection function
+#' @return Numeric Matrix
+#'
+#' @noRd
+#'
+rtwig_window2user <- function(x, y, z, projection) {
+    .Call(`_rTwig_rtwig_window2user`, x, y, z, projection)
+}
+
+#' @title Translation Matrix
+#'
+#' @description Generates translation matrix
+#'
+#' @param x coordinate
+#' @param y coordinate
+#' @param z coordinate
+#'
+#' @noRd
+#'
+translation_matrix <- function(x, y, z) {
+    .Call(`_rTwig_translation_matrix`, x, y, z)
+}
+
+#' @title User Matrix
+#'
+#' @description Generates user matrix to update RGL plot view
+#'
+#' @param x coordinate
+#' @param y coordinate
+#' @param z coordinate
+#' @param start List of starting values
+#'
+#' @noRd
+#'
+user_matrix <- function(x, y, z, start) {
+    .Call(`_rTwig_user_matrix`, x, y, z, start)
 }
 
 #' @title Connect Cylinders

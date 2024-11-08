@@ -1,3 +1,66 @@
+# rTwig 1.2.0
+
+## New Features
+
+-   `cluster_cloud()`: A New function to transfer QSM variables to the input point cloud or simulate a point cloud from the QSM. Efficient nearest neighbor searching is done with the C++ *nanoflann* library: <https://github.com/jlblancoc/nanoflann>
+
+-   `prune_qsm()`: A new function to efficiently and easily prune QSMs using multiple pruning criteria and return options.
+
+-   aRchi QSMs are now supported in the package.
+
+-   Users can now pass radius or color column variables either unquoted or quoted to user facing functions like `plot_qsm()`, `qsm_summary()`, or `export_mesh()`. Piping the QSM cylinders into these functions allows the user to easily select unquoted columns.
+
+-   `update_cylinders()`: Three new allometric scaling variables as standard outputs - *vessel_volume*, *pipe_area*, *pipe_radius*.
+
+-   `plot_qsm()`: Point clouds and stem triangulation meshes can now be plotted independently of a QSM.
+
+    -   *triangulation*: The user can now plot TreeQSM triangulation meshes by passing in the triangulation list from `import_qsm()`. The user can also control the color and palette with *tri_color* and *tri_palette*.
+    -   *pan*: The right mouse button now pans the plot instead of zooming by default. The functionality mimics `pan3d()` from RGL, but rewritten with Rcpp for better responsiveness.
+    -   *lit*: Enable or disable plot lighting
+    -   *alpha*: Set cylinder transparency. Note: can degrade performance with large numbers of cylinders or facets.
+    -   *axes_color*: The axes color can now be set by the user.
+    -   *skeleton_lwd*: Set the line width of the skeleton plots.
+    -   *normalize*: Center the cylinders around 0,0,0. Defaults to FALSE.
+
+-   `correct_radii()`:
+
+    -   The broken branch filter can now be disabled, with *broken_branch = FALSE*
+
+    -   Now returns *modified*, an index of what cylinders were modified by Real Twig.
+
+-   `run_rtwig()`: The broken branch filter can now be disabled, with *broken_branch = FALSE*
+
+## Improvements
+
+-   `correct_radii()`: Complete refactor with Rcpp and tidyeval for better maintainability.
+    -   \~ 2 - 3x performance improvement!
+    -   The outlier and broken branch filters are rewritten in Rcpp, for massive performance gains.
+    -   Parallel processing has been removed, eliminating overhead and excessive memory usage.
+-   `update_cylinders()`: Fix a bug in path metrics for SimpleForest QSMs (issue #4).
+-   `qsm_summary()`:
+    -   Refactored with tidyeval.
+    -   Fix bug where triangulation was not using the correct ending cylinder.
+-   `box_dimension()`: The 3D plot now pans on right mouse button.
+-   `run_rtwig()`: Fix missing Treegraph parameter (issue #5).
+-   `tree_metrics()`:
+    -   Fix a bug where the start x,y,z values were incorrect.
+    -   Fix a bug where NA cylinder orientation values would cause the calculations to fail.
+    -   NA values are removed and the user sees a warning promoting them to check the QSM.
+-   The QSM network is now cached in the temp folder to avoid repeat calculations.
+-   Data checking and helpful error messages are now included for every function.
+-   Add the Real Twig Method paper citation in the package and readme.
+-   New website look.
+-   Update vignettes.
+-   Update twig data base.
+-   Reduced package dependencies.
+
+## Breaking Changes
+
+-   `qsm_summary()`: User can pass *radius* as either a quoted or unquoted column name, so there is no longer any default value. Failing to provide a radius will throw an error prompting the user for a radius column name.
+-   `correct_radii()`: parallel processing has been removed, so *backend* is no longer a parameter.
+-   `run_rtwig()`:parallel processing has been removed, so *backend* is no longer a parameter.
+-   *file* has been changed to *filename* in `run_rtwig()`, `import_qsm()`, and `import_treegraph()` to be consistent with other functions.
+
 # rTwig 1.1.0
 
 ## New Features

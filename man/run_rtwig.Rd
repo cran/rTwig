@@ -5,21 +5,19 @@
 \title{Run Real Twig}
 \usage{
 run_rtwig(
-  file,
+  filename,
   twig_radius,
-  backend = "multisession",
   metrics = TRUE,
   version = NULL,
   smooth = TRUE,
-  standardize = FALSE
+  standardize = FALSE,
+  broken_branch = TRUE
 )
 }
 \arguments{
-\item{file}{file path to QSM (.mat, .csv, .json)}
+\item{filename}{file path to QSM (.mat, .csv, .json)}
 
 \item{twig_radius}{Twig radius in millimeters}
-
-\item{backend}{Parallel backend for multi-core processing. Defaults to "multisession" (all platforms), but can be set to "multicore" (MacOS & Linux), "cluster" (all platforms), or a "package::backend" string.}
 
 \item{metrics}{Calculate tree metrics? Defaults to TRUE.}
 
@@ -28,6 +26,8 @@ run_rtwig(
 \item{smooth}{Defaults to TRUE, if using TreeQSM. Can be set to FALSE.}
 
 \item{standardize}{Standardize QSM cylinder data? Defaults to FALSE. Can be set to TRUE.}
+
+\item{broken_branch}{Enable or disable the broken branch filter. Defaults to TRUE.}
 }
 \value{
 Returns cylinder data frame or list if metrics is true.
@@ -36,17 +36,10 @@ Returns cylinder data frame or list if metrics is true.
 Runs all Real Twig steps
 }
 \examples{
-\donttest{
 
 ## TreeQSM
 file <- system.file("extdata/QSM.mat", package = "rTwig")
 qsm <- run_rtwig(file, twig_radius = 4.23)
 str(qsm$cylinder)
-
-## SimpleForest
-file <- system.file("extdata/QSM.csv", package = "rTwig")
-qsm <- run_rtwig(file, twig_radius = 4.23)
-str(qsm)
-}
 
 }

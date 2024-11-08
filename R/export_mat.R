@@ -9,7 +9,6 @@
 #' @export
 #'
 #' @examples
-#' \donttest{
 #'
 #' ## TreeQSM Processing Chain
 #' file <- system.file("extdata/QSM.mat", package = "rTwig")
@@ -17,7 +16,7 @@
 #' cylinder <- qsm$cylinder
 #' cylinder <- update_cylinders(cylinder)
 #'
-#' filename <- tempfile(pattern = "TreeQSM_QSM.mat")
+#' filename <- tempfile(pattern = "TreeQSM_QSM", fileext = ".mat")
 #' export_mat(cylinder, filename)
 #'
 #' ## SimpleForest Processing Chain
@@ -25,12 +24,46 @@
 #' cylinder <- read.csv(file)
 #' cylinder <- update_cylinders(cylinder)
 #'
-#' filename <- tempfile(pattern = "SimpleForest_QSM.mat")
+#' filename <- tempfile(pattern = "SimpleForest_QSM", fileext = ".mat")
 #' export_mat(cylinder, filename)
-#' }
 #'
 export_mat <- function(cylinder, filename) {
-  message("Exporting to .mat")
+  # Check inputs ---------------------------------------------------------------
+  if (is_missing(cylinder)) {
+    message <- "argument `cylinder` is missing, with no default."
+    abort(message, class = "missing_argument")
+  }
+
+  if (!is.data.frame(cylinder)) {
+    message <- paste(
+      paste0("`cylinder` must be a data frame, not ", class(cylinder), "."),
+      "i Did you accidentally pass the QSM list instead of the cylinder data frame?",
+      sep = "\n"
+    )
+    abort(message, class = "data_format_error")
+  }
+
+  if (is_missing(filename)) {
+    message <- "argument `filename` is missing, with no default."
+    abort(message, class = "missing_argument")
+  }
+
+  if (!is_string(filename)) {
+    message <- paste0(
+      "`filename` must be a string, not ", class(filename), "."
+    )
+    abort(message, class = "invalid_argument")
+  }
+
+  # Ensure filename ends with correct extension
+  if (substr(filename, nchar(filename) - 3, nchar(filename)) != ".mat") {
+    filename <- paste0(filename, ".mat")
+  }
+
+  # Verify cylinders
+  cylinder <- verify_cylinders(cylinder)
+
+  inform("Exporting to .mat")
 
   # rTwig ----------------------------------------------------------------------
   if (all(c("id", "parent", "start_x", "branch_order") %in% colnames(cylinder))) {
@@ -220,11 +253,53 @@ export_mat <- function(cylinder, filename) {
     )
 
     R.matlab::writeMat(filename, cylinder = output)
-  } else {
-    message(
-      "Invalid Dataframe Supplied!!!
-      \nOnly TreeQSM, SimpleForest, or Treegraph QSMs are supported.
-      \nMake sure the cylinder data frame and not the QSM list is supplied."
+  }
+  # aRchi ----------------------------------------------------------------------
+  else if (all(c("cyl_ID", "parent_ID", "branching_order") %in% colnames(cylinder))) {
+    radius <- as.matrix(cylinder$radius_cyl)
+    length <- as.matrix(cylinder$length)
+
+    start <- cylinder %>%
+      select(start.x = "startX", start.y = "startY", start.z = "startZ") %>%
+      as.matrix()
+
+    axis <- cylinder %>%
+      select(axis.x = "axisX", axis.y = "axisY", axis.z = "axisZ") %>%
+      as.matrix()
+
+    parent <- as.matrix(cylinder$parent_ID)
+    extension <- as.matrix(cylinder$cyl_ID)
+    added <- NA
+    UnmodRadius <- as.matrix(cylinder$UnmodRadius)
+    branch <- as.matrix(cylinder$branch_ID)
+    SurfCov <- NA
+    mad <- NA
+    BranchOrder <- as.matrix(cylinder$branching_order)
+    PositionInBranch <- as.matrix(cylinder$positionInBranch)
+
+    output <- list(
+      radius = radius,
+      length = length,
+      start = start,
+      axis = axis,
+      parent = parent,
+      extension = extension,
+      added = added,
+      UnmodRadius = UnmodRadius,
+      branch = branch,
+      SurfCov = SurfCov,
+      mad = mad,
+      BranchOrder = BranchOrder,
+      PositionInBranch = PositionInBranch
     )
+
+    R.matlab::writeMat(filename, cylinder = output)
+  } else {
+    message <- paste(
+      "Unsupported QSM format provided.",
+      "i Only TreeQSM, SimpleForest, Treegraph, or aRchi QSMs are supported.",
+      sep = "\n"
+    )
+    abort(message, class = "data_format_error")
   }
 }

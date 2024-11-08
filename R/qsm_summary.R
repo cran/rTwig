@@ -1,385 +1,276 @@
 #' QSM Summary
 #'
-#' @description Generates summaries of QSM features (e.g. volume, surface area, dbh, etc.) by totals and branch order
+#' @description Generates a simple QSM summary (e.g. volume, surface area, dbh, etc.) by totals and branch order.
 #'
 #' @param cylinder QSM cylinder data frame
-#' @param radius Radius type as either "modified", "unmodified", or "old". Defaults to "modified".
-#' @param triangulation QSM triangulation list. Defaults to FALSE.
+#' @param radius Radius column name either quoted or unquoted.
+#' @param triangulation QSM triangulation list. Defaults to NULL. Only supports TreeQSM.
 #'
 #' @return Returns a list
 #' @export
 #'
 #' @examples
 #'
-#' ## TreeQSM Processing Chain
-#' file <- system.file("extdata/QSM.mat", package = "rTwig")
-#' qsm <- import_qsm(file)
-#' cylinder <- qsm$cylinder
+#' ## SimpleForest Processing Chain
+#' file <- system.file("extdata/QSM.csv", package = "rTwig")
+#' cylinder <- read.csv(file)
 #' cylinder <- update_cylinders(cylinder)
-#' qsm_summary(cylinder)
+#' qsm_summary(cylinder, radius)
 #'
 #' # TreeQSM Triangulation
 #' file <- system.file("extdata/QSM.mat", package = "rTwig")
 #' qsm <- import_qsm(file)
 #' cylinder <- qsm$cylinder
 #' cylinder <- update_cylinders(cylinder)
-#' triangulation <- qsm$triangulation
-#' qsm_summary(cylinder = cylinder, triangulation = triangulation)
+#' qsm_summary(cylinder, radius, triangulation = qsm$triangulation)
 #'
-#' ## SimpleForest Processing Chain
-#' file <- system.file("extdata/QSM.csv", package = "rTwig")
-#' cylinder <- read.csv(file)
-#' cylinder <- update_cylinders(cylinder)
-#' qsm_summary(cylinder)
-#'
-qsm_summary <- function(cylinder, radius = "modified", triangulation = FALSE) {
-  message("Creating QSM Summary")
+qsm_summary <- function(cylinder, radius, triangulation = NULL) {
+  # Check inputs ---------------------------------------------------------------
+  if (is_missing(cylinder)) {
+    message <- "argument `cylinder` is missing, with no default."
+    abort(message, class = "missing_argument")
+  }
+
+  if (!is.data.frame(cylinder)) {
+    message <- paste(
+      "`cylinder` must be a data frame.",
+      "i Did you accidentally pass the QSM list instead of the cylinder data frame?",
+      sep = "\n"
+    )
+    abort(message, class = "data_format_error")
+  }
+
+  if (missing(radius)) { # Use base::missing to support unquoted columns
+    message <- "argument `radius` is missing, with no default."
+    abort(message, class = "missing_argument")
+  } else {
+    radius <- select_column(rlang::enquo(radius))
+
+    if (!any(radius %in% colnames(cylinder))) {
+      abort(paste(
+        "Can't select columns that don't exist.",
+        paste0("X Column `", radius, "' doesn't exist."),
+        "i Did you mistype your `radius` column name?`.",
+        sep = "\n"
+      ))
+    } else {
+      radius <- pull(cylinder, !!radius)
+    }
+  }
+
+  inform("Creating QSM Summary")
 
   # rTwig ----------------------------------------------------------------------
   if (all(c("id", "parent", "start_x", "branch_order") %in% colnames(cylinder))) {
-    # Setup Radius
-    if (radius == "modified") {
-      cylinder$sumrad <- cylinder$radius
-    } else if (radius == "unmodified") {
-      cylinder$sumrad <- cylinder$raw_radius
-    } else if (radius == "old") {
-      cylinder$sumrad <- cylinder$raw_radius
+    if (!is.null(triangulation)) {
+      inform("Main stem triangulation not supported.")
     }
 
-    dbh <- cylinder %>%
-      filter(.data$branch_order == 0 & .data$branch == 1) %>%
-      arrange(.data$branch_position) %>%
-      select(.data$length, .data$sumrad)
-
-    # Finds the DBH cylinder
-    for (i in 1:nrow(dbh)) {
-      DBHCyl <- sum(dbh$length[1:i])
-      if (DBHCyl >= 1.37) {
-        break
-      }
-    }
-
-    DBHCyl <- as.numeric(i)
-
-    dbh_qsm_cm <- dbh$sumrad[DBHCyl] * 200
-
-    tree_height_m <- max(cylinder$start_z) - min(cylinder$start_z)
-
-    # Branch Order Summary
-    summary <- cylinder %>%
-      mutate(
-        Volume = pi * .data$sumrad^2 * .data$length,
-        SurfaceArea = 2 * pi * .data$sumrad * .data$length
-      ) %>%
-      group_by("branch_order") %>%
-      summarize(
-        tree_volume_L = sum(.data$Volume, na.rm = TRUE) * 1e3,
-        tree_area_m2 = sum(.data$SurfaceArea, na.rm = TRUE)
-      )
-
-    # Total Summary
-    tree_volume_L <- summary %>%
-      summarize(tree_volume_L = sum(.data$tree_volume_L))
-
-    stem_volume_L <- summary %>%
-      filter(.data$branch_order == 0) %>%
-      summarize(stem_volume_L = sum(.data$tree_volume_L))
-
-    branch_volume_L <- summary %>%
-      filter(.data$branch_order != 0) %>%
-      summarize(branch_volume_L = sum(.data$tree_volume_L))
-
-    tree_area_m2 <- summary %>%
-      summarize(tree_area_m2 = sum(.data$tree_area_m2))
-
-    stem_area_m2 <- summary %>%
-      filter(.data$branch_order == 0) %>%
-      summarize(stem_area_m2 = sum(.data$tree_area_m2))
-
-    branch_area_m2 <- summary %>%
-      filter(.data$branch_order != 0) %>%
-      summarize(branch_area_m2 = sum(.data$tree_area_m2))
-
-    summary2 <- bind_cols(
-      "dbh_qsm_cm" = dbh_qsm_cm,
-      "tree_height_m" = tree_height_m,
-      stem_volume_L,
-      branch_volume_L,
-      tree_volume_L,
-      stem_area_m2,
-      branch_area_m2,
-      tree_area_m2
+    data_summary(
+      cylinder = cylinder,
+      radius = radius, length = "length", branch = "branch",
+      branch_order = "branch_order", branch_position = "branch_position",
+      start_z = "start_z", id = "id", triangulation = NULL
     )
   }
   # TreeQSM --------------------------------------------------------------------
   else if (all(c("parent", "extension", "branch", "BranchOrder") %in% colnames(cylinder))) {
-    # Setup Radius
-    if (radius == "modified") {
-      cylinder$sumrad <- cylinder$radius
-    } else if (radius == "unmodified") {
-      cylinder$sumrad <- cylinder$UnmodRadius
-    } else if (radius == "old") {
-      cylinder$sumrad <- cylinder$OldRadius
-    }
-
-    dbh <- cylinder %>%
-      filter(.data$BranchOrder == 0 & .data$branch == 1) %>%
-      arrange(.data$PositionInBranch) %>%
-      select(.data$length, .data$sumrad)
-
-    # Gets the triangulation and QSM volumes and surface areas to be swapped
-    if (!is.logical(triangulation)) {
-      # Finds the triangulation end cylinder
-      cyl_end <- pull(triangulation$cylind - 2)
-
-      # Gets the QSM volumes
-      QSM_vol_sa <- cylinder %>%
-        filter(.data$extension %in% c(1:cyl_end)) %>%
-        mutate(
-          Volume = pi * .data$sumrad^2 * .data$length * 1e3,
-          SurfaceArea = 2 * pi * .data$sumrad * .data$length
-        ) %>%
-        summarize(
-          CylVol = sum(.data$Volume),
-          CylSA = sum(.data$SurfaceArea)
-        )
-
-      # Triangulation Volume and Surface Area
-      TriVol <- pull(triangulation$volume)
-      TriSA <- pull(triangulation$SideArea)
-    }
-
-    # Finds the DBH cylinder
-    for (i in 1:nrow(dbh)) {
-      DBHCyl <- sum(dbh$length[1:i])
-      if (DBHCyl >= 1.37) {
-        break
-      }
-    }
-
-    DBHCyl <- as.numeric(i)
-
-    dbh_qsm_cm <- dbh$sumrad[DBHCyl] * 200
-
-    tree_height_m <- max(cylinder$start.z) - min(cylinder$start.z)
-
-    # Branch Order Summary
-    summary <- cylinder %>%
-      mutate(
-        Volume = pi * .data$sumrad^2 * .data$length,
-        SurfaceArea = 2 * pi * .data$sumrad * .data$length
-      ) %>%
-      group_by("BranchOrder") %>%
-      summarize(
-        tree_volume_L = sum(.data$Volume, na.rm = TRUE) * 1e3,
-        tree_area_m2 = sum(.data$SurfaceArea, na.rm = TRUE)
-      )
-
-    # Update with triangulation volumes
-    if (!is.logical(triangulation)) {
-      summary$tree_volume_L[1] <- summary$tree_volume_L[1] - QSM_vol_sa$CylVol + TriVol
-      summary$tree_area_m2[1] <- summary$tree_area_m2[1] - QSM_vol_sa$CylSA + TriSA
-    }
-
-    # Total Summary
-    tree_volume_L <- summary %>%
-      summarize(tree_volume_L = sum(.data$tree_volume_L))
-
-    stem_volume_L <- summary %>%
-      filter(.data$BranchOrder == 0) %>%
-      summarize(stem_volume_L = sum(.data$tree_volume_L))
-
-    branch_volume_L <- summary %>%
-      filter(.data$BranchOrder != 0) %>%
-      summarize(branch_volume_L = sum(.data$tree_volume_L))
-
-    tree_area_m2 <- summary %>%
-      summarize(tree_area_m2 = sum(.data$tree_area_m2))
-
-    stem_area_m2 <- summary %>%
-      filter(.data$BranchOrder == 0) %>%
-      summarize(stem_area_m2 = sum(.data$tree_area_m2))
-
-    branch_area_m2 <- summary %>%
-      filter(.data$BranchOrder != 0) %>%
-      summarize(branch_area_m2 = sum(.data$tree_area_m2))
-
-    summary2 <- bind_cols(
-      "dbh_qsm_cm" = dbh_qsm_cm,
-      "tree_height_m" = tree_height_m,
-      stem_volume_L,
-      branch_volume_L,
-      tree_volume_L,
-      stem_area_m2,
-      branch_area_m2,
-      tree_area_m2
+    data_summary(
+      cylinder = cylinder,
+      radius = radius, length = "length", branch = "branch",
+      branch_order = "BranchOrder", branch_position = "PositionInBranch",
+      start_z = "start.z", id = "extension", triangulation = triangulation
     )
   }
   # SimpleForest ---------------------------------------------------------------
   else if (all(c("ID", "parentID", "branchID", "branchOrder") %in% colnames(cylinder))) {
-    # Stop on Triangulation
-    if (!triangulation == FALSE) {
-      stop("SimpleForest does not support triangulation of the main stem!")
+    if (!is.null(triangulation)) {
+      inform("Main stem triangulation not supported.")
     }
 
-    # Setup Radius
-    if (radius == "modified") {
-      cylinder$sumrad <- cylinder$radius
-    } else if (radius == "unmodified") {
-      cylinder$sumrad <- cylinder$UnmodRadius
-    } else if (radius == "old") {
-      cylinder$sumrad <- cylinder$OldRadius
-    }
-
-    dbh <- cylinder %>%
-      filter(.data$branchOrder == 0 & .data$branchID == 1) %>%
-      arrange(.data$ID) %>%
-      select("length", "sumrad")
-
-    # Finds the DBH cylinder
-    for (i in 1:nrow(dbh)) {
-      DBHCyl <- sum(dbh$length[1:i])
-      if (DBHCyl >= 1.37) {
-        break
-      }
-    }
-
-    DBHCyl <- as.numeric(i)
-
-    dbh_qsm_cm <- dbh$sumrad[DBHCyl] * 200
-
-    tree_height_m <- max(cylinder$startZ) - min(cylinder$startZ)
-
-    summary <- cylinder %>%
-      mutate(
-        Volume = pi * .data$sumrad^2 * .data$length,
-        SurfaceArea = 2 * pi * .data$sumrad * .data$length
-      ) %>%
-      group_by("branchOrder") %>%
-      summarize(
-        tree_volume_L = sum(.data$Volume, na.rm = TRUE) * 1e3,
-        tree_area_m2 = sum(.data$SurfaceArea, na.rm = TRUE)
-      ) %>%
-      rename(BranchOrder = "branchOrder")
-
-    tree_volume_L <- summary %>%
-      summarize(tree_volume_L = sum(.data$tree_volume_L))
-
-    stem_volume_L <- summary %>%
-      filter(.data$BranchOrder == 0) %>%
-      summarize(stem_volume_L = sum(.data$tree_volume_L))
-
-    branch_volume_L <- summary %>%
-      filter(.data$BranchOrder != 0) %>%
-      summarize(branch_volume_L = sum(.data$tree_volume_L))
-
-    tree_area_m2 <- summary %>%
-      summarize(tree_area_m2 = sum(.data$tree_area_m2))
-
-    stem_area_m2 <- summary %>%
-      filter(.data$BranchOrder == 0) %>%
-      summarize(stem_area_m2 = sum(.data$tree_area_m2))
-
-    branch_area_m2 <- summary %>%
-      filter(.data$BranchOrder != 0) %>%
-      summarize(branch_area_m2 = sum(.data$tree_area_m2))
-
-    summary2 <- bind_cols(
-      "dbh_qsm_cm" = dbh_qsm_cm,
-      "tree_height_m" = tree_height_m,
-      stem_volume_L,
-      branch_volume_L,
-      tree_volume_L,
-      stem_area_m2,
-      branch_area_m2,
-      tree_area_m2
+    data_summary(
+      cylinder = cylinder,
+      radius = radius, length = "length", branch = "branchID",
+      branch_order = "branchOrder", branch_position = "positionInBranch",
+      start_z = "startZ", id = "ID", triangulation = NULL
     )
   }
   # Treegraph ------------------------------------------------------------------
   else if (all(c("p1", "p2", "ninternode") %in% colnames(cylinder))) {
-    # Stop on Triangulation
-    if (!triangulation == FALSE) {
-      stop("Treegraph does not support triangulation of the main stem!")
+    if (!is.null(triangulation)) {
+      inform("Main stem triangulation not supported.")
     }
 
-    # Setup Radius
-    if (radius == "modified") {
-      cylinder$sumrad <- cylinder$radius
-    } else if (radius == "unmodified") {
-      cylinder$sumrad <- cylinder$UnmodRadius
-    } else if (radius == "old") {
-      cylinder$sumrad <- cylinder$OldRadius
-    }
-
-    dbh <- cylinder %>%
-      filter(.data$branch_order == 0 & .data$nbranch == 1) %>%
-      arrange(.data$p1) %>%
-      select("length", "sumrad")
-
-    # Finds the DBH cylinder
-    for (i in 1:nrow(dbh)) {
-      DBHCyl <- sum(dbh$length[1:i])
-      if (DBHCyl >= 1.37) {
-        break
-      }
-    }
-
-    DBHCyl <- as.numeric(i)
-
-    dbh_qsm_cm <- dbh$sumrad[DBHCyl] * 200
-
-    tree_height_m <- max(cylinder$sz) - min(cylinder$sz)
-
-    summary <- cylinder %>%
-      mutate(
-        Volume = pi * .data$sumrad^2 * .data$length,
-        SurfaceArea = 2 * pi * .data$sumrad * .data$length
-      ) %>%
-      group_by("branch_order") %>%
-      summarize(
-        tree_volume_L = sum(.data$Volume, na.rm = TRUE) * 1e3,
-        tree_area_m2 = sum(.data$SurfaceArea, na.rm = TRUE)
-      ) %>%
-      rename(BranchOrder = "branch_order")
-
-    tree_volume_L <- summary %>%
-      summarize(tree_volume_L = sum(.data$tree_volume_L))
-
-    stem_volume_L <- summary %>%
-      filter(.data$BranchOrder == 0) %>%
-      summarize(stem_volume_L = sum(.data$tree_volume_L))
-
-    branch_volume_L <- summary %>%
-      filter(.data$BranchOrder != 0) %>%
-      summarize(branch_volume_L = sum(.data$tree_volume_L))
-
-    tree_area_m2 <- summary %>%
-      summarize(tree_area_m2 = sum(.data$tree_area_m2))
-
-    stem_area_m2 <- summary %>%
-      filter(.data$BranchOrder == 0) %>%
-      summarize(stem_area_m2 = sum(.data$tree_area_m2))
-
-    branch_area_m2 <- summary %>%
-      filter(.data$BranchOrder != 0) %>%
-      summarize(branch_area_m2 = sum(.data$tree_area_m2))
-
-    summary2 <- bind_cols(
-      "dbh_qsm_cm" = dbh_qsm_cm,
-      "tree_height_m" = tree_height_m,
-      stem_volume_L,
-      branch_volume_L,
-      tree_volume_L,
-      stem_area_m2,
-      branch_area_m2,
-      tree_area_m2
-    )
-  } else {
-    message(
-      "Invalid Dataframe Supplied!!!
-      \nOnly TreeQSM, SimpleForest, or Treegraph QSMs are supported.
-      \nMake sure the cylinder data frame and not the QSM list is supplied."
+    data_summary(
+      cylinder = cylinder,
+      radius = radius, length = "length", branch = "nbranch",
+      branch_order = "branch_order", branch_position = "positionInBranch",
+      start_z = "sz", id = "p1", triangulation = NULL
     )
   }
+  # aRchi ----------------------------------------------------------------------
+  else if (all(c("cyl_ID", "parent_ID", "branching_order") %in% colnames(cylinder))) {
+    if (!is.null(triangulation)) {
+      inform("Main stem triangulation not supported.")
+    }
+
+    data_summary(
+      cylinder = cylinder,
+      radius = radius, length = "length", branch = "branch_ID",
+      branch_order = "branching_order", branch_position = "positionInBranch",
+      start_z = "startZ", id = "cyl_ID", triangulation = NULL
+    )
+  } else {
+    message <- paste(
+      "Unsupported QSM format provided.",
+      "i Only TreeQSM, SimpleForest, Treegraph, or aRchi QSMs are supported.",
+      sep = "\n"
+    )
+    abort(message, class = "data_format_error")
+  }
+}
+
+#' Data summary
+#' @param cylinder QSM cylinder data frame
+#' @param radius cylinder radii
+#' @param length cylinder length
+#' @param branch cylinder branch id
+#' @param branch_order cylinder branch order
+#' @param branch_position cylinder branch position
+#' @param start_z column name of start_z
+#' @param id cylinder id
+#' @param triangulation TreeQSM triangulation
+#'
+#' @return a list
+#' @noRd
+#'
+data_summary <- function(
+    cylinder,
+    radius,
+    length,
+    branch,
+    branch_order,
+    branch_position,
+    start_z,
+    id,
+    triangulation) {
+  # Subset cylinder data
+  cylinder <- cylinder %>%
+    select(
+      all_of(
+        c(length, branch, branch_order, branch_position, start_z, id)
+      )
+    ) %>%
+    rename(
+      "length" = {{ length }},
+      "branch" = {{ branch }},
+      "branch_order" = {{ branch_order }},
+      "branch_position" = {{ branch_position }},
+      "start_z" = {{ start_z }},
+      "id" = {{ id }}
+    ) %>%
+    mutate(radius := {{ radius }})
+
+  # Diameter at breast height (DBH)
+  dbh <- cylinder %>%
+    filter(.data$branch_order == 0 & .data$branch == 1) %>%
+    arrange(.data$branch_position) %>%
+    select("length", "radius")
+
+  for (i in 1:nrow(dbh)) {
+    DBHCyl <- sum(dbh$length[1:i])
+    if (DBHCyl >= 1.37) {
+      break
+    }
+  }
+
+  dbh_qsm_cm <- dbh$radius[as.numeric(i)] * 200
+
+  # Tree height
+  tree_height_m <- max(cylinder$start_z) - min(cylinder$start_z)
+
+  # Triangulation volumes
+  if (!is.null(triangulation)) {
+    if (!is_list(triangulation)) {
+      message <- paste(
+        paste0("`triangulation` must be a list, not ", class(triangulation), "."),
+        "i `triangulation` must be created by `import_qsm()`.",
+        sep = "\n"
+      )
+      abort(message, class = "data_format_error")
+    }
+
+    # Finds the triangulation end cylinder
+    cyl_end <- pull(triangulation$cylind - 1)
+
+    # Gets the QSM volumes
+    qsm_vol_sa <- cylinder %>%
+      filter(.data$id %in% c(1:cyl_end)) %>%
+      mutate(
+        volume = pi * .data$radius^2 * .data$length * 1e3,
+        surface_area = 2 * pi * .data$radius * .data$length
+      ) %>%
+      summarise(
+        cyl_volume = sum(.data$volume),
+        cyl_surface_area = sum(.data$surface_area)
+      )
+
+    # Triangulation Volume and Surface Area
+    tri_volume <- pull(triangulation$volume)
+    tri_surface_area <- pull(triangulation$SideArea)
+  }
+
+  # Branch order summary
+  summary <- cylinder %>%
+    mutate(
+      volume = pi * .data$radius^2 * .data$length,
+      surface_area = 2 * pi * .data$radius * .data$length
+    ) %>%
+    group_by("branch_order") %>%
+    summarise(
+      tree_volume_L = sum(.data$volume, na.rm = TRUE) * 1e3,
+      tree_area_m2 = sum(.data$surface_area, na.rm = TRUE)
+    )
+
+  # Update with triangulation volumes
+  if (!is.null(triangulation)) {
+    summary$tree_volume_L[1] <- summary$tree_volume_L[1] - qsm_vol_sa$cyl_volume + tri_volume
+    summary$tree_area_m2[1] <- summary$tree_area_m2[1] - qsm_vol_sa$cyl_surface_area + tri_surface_area
+  }
+
+  # Tree summary
+  tree_volume_L <- summary %>%
+    summarise(tree_volume_L = sum(.data$tree_volume_L))
+
+  stem_volume_L <- summary %>%
+    filter(.data$branch_order == 0) %>%
+    summarise(stem_volume_L = sum(.data$tree_volume_L))
+
+  branch_volume_L <- summary %>%
+    filter(.data$branch_order != 0) %>%
+    summarise(branch_volume_L = sum(.data$tree_volume_L))
+
+  tree_area_m2 <- summary %>%
+    summarise(tree_area_m2 = sum(.data$tree_area_m2))
+
+  stem_area_m2 <- summary %>%
+    filter(.data$branch_order == 0) %>%
+    summarise(stem_area_m2 = sum(.data$tree_area_m2))
+
+  branch_area_m2 <- summary %>%
+    filter(.data$branch_order != 0) %>%
+    summarise(branch_area_m2 = sum(.data$tree_area_m2))
+
+  summary2 <- bind_cols(
+    "dbh_qsm_cm" = dbh_qsm_cm,
+    "tree_height_m" = tree_height_m,
+    stem_volume_L,
+    branch_volume_L,
+    tree_volume_L,
+    stem_area_m2,
+    branch_area_m2,
+    tree_area_m2
+  )
+
   return(list(summary, summary2))
 }

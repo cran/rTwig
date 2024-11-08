@@ -2,14 +2,9 @@
 #'
 #' @description Updates the QSM cylinder data in preparation for radii correction
 #'
-#' @details Updates parent-child branch and cylinder relationships to fill in any gaps.
-#' Four useful QSM metrics developed by Jan Hackenberg are also calculated.
-#' Growth length is the length of a parent cylinder, plus the lengths of all of
-#' its child cylinders. The segment is a portion of a branch between two branching nodes.
-#' The reverse branch order assigns twigs as order 1 and works backwards at each
-#' branching junction to the base of the stem, which has the largest reverse branch order.
-#' Distance from twig is the average distance to all connected twigs for a given cylinder.
-#' Two new metrics, distance from base, and total children, are also calculated.
+#' @details Updates and verifies parent-child cylinder relationships and
+#' calculates new variables and metrics found throughout the supported QSM software.
+#' This function is required to run the rest of the rTwig functions.
 #'
 #' @param cylinder QSM cylinder data frame
 #'
@@ -36,7 +31,28 @@
 #' cylinder <- update_cylinders(cylinder)
 #' str(cylinder)
 #'
+#' ## aRchi Processing Chain
+#' file <- system.file("extdata/QSM2.csv", package = "rTwig")
+#' cylinder <- read.csv(file)
+#' cylinder <- update_cylinders(cylinder)
+#' str(cylinder)
+#'
 update_cylinders <- function(cylinder) {
+  # Check inputs ---------------------------------------------------------------
+  if (is_missing(cylinder)) {
+    message <- "argument `cylinder` is missing, with no default."
+    abort(message, class = "missing_argument")
+  }
+
+  if (!is.data.frame(cylinder)) {
+    message <- paste(
+      paste0("`cylinder` must be a data frame, not ", class(cylinder), "."),
+      "i Did you accidentally pass the QSM list instead of the cylinder data frame?",
+      sep = "\n"
+    )
+    abort(message, class = "data_format_error")
+  }
+
   # TreeQSM --------------------------------------------------------------------
   if (all(c("parent", "extension", "branch", "BranchOrder") %in% colnames(cylinder))) {
     # Save All Radii -----------------------------------------------------------
@@ -76,7 +92,7 @@ update_cylinders <- function(cylinder) {
     cylinder <- total_children(cylinder, "parent", "extension")
 
     # Build QSM Cylinder Network  ----------------------------------------------
-    network <- build_network(cylinder, "extension", "parent")
+    network <- build_network(cylinder, "extension", "parent", cache = TRUE)
 
     # Verify Topology ----------------------------------------------------------
     cylinder <- verify_topology(
@@ -103,9 +119,8 @@ update_cylinders <- function(cylinder) {
     cylinder <- path_metrics(network, cylinder, "extension", "length")
 
     # Organize Cylinders  ------------------------------------------------------
-
     if (all(c("SurfCov", "mad") %in% colnames(cylinder))) {
-      cylinder <- cylinder %>%
+      cylinder %>%
         relocate("OldRadius", .after = "UnmodRadius") %>%
         relocate("reverseBranchOrder", .after = "BranchOrder") %>%
         relocate("segment", .after = "PositionInBranch") %>%
@@ -122,7 +137,7 @@ update_cylinders <- function(cylinder) {
         relocate("end.z", .after = "end.y") %>%
         relocate("branch_alt", .after = "branch")
     } else {
-      cylinder <- cylinder %>%
+      cylinder %>%
         relocate("OldRadius", .after = "UnmodRadius") %>%
         relocate("reverseBranchOrder", .after = "BranchOrder") %>%
         relocate("segment", .after = "PositionInBranch") %>%
@@ -151,7 +166,7 @@ update_cylinders <- function(cylinder) {
         parentSegmentID = .data$parentSegmentID + 1
       )
 
-    # Adds cylinder info for plotting ------------------------------------------
+    # Plotting Info ------------------------------------------------------------
     cylinder <- cylinder %>%
       mutate(
         UnmodRadius = .data$radius,
@@ -169,52 +184,16 @@ update_cylinders <- function(cylinder) {
       mutate(branch_alt = .data$branchID - 1) %>%
       select(-"branchID")
 
-    # Generates new branch IDs -------------------------------------------------
-    message("Updating Branch Ordering")
-
-    # Initialize an empty list to store results
-    connected_segments <- list()
-
-    # Find unique branches
-    for (order in unique(cylinder$branchOrder)) {
-      order_df <- filter(cylinder, .data$branchOrder == order)
-      edges <- tidytable(from = order_df$parentID, to = order_df$ID)
-      g <- igraph::graph_from_data_frame(d = edges, directed = FALSE)
-      components <- igraph::clusters(g)
-      order_df$index <- components$membership[match(order_df$ID, igraph::V(g)$name)]
-      connected_segments[[as.character(order)]] <- order_df
-    }
-
-    # Create unique branch ids
-    branch_new <- bind_rows(connected_segments) %>%
-      group_by("branchOrder", "index") %>%
-      mutate(branchID = cur_group_id()) %>%
-      ungroup() %>%
-      select("ID", "branchID")
-
-    # Join new branch ids and calculates position in branch
-    cylinder <- left_join(cylinder, branch_new) %>%
-      group_by("branchID") %>%
-      mutate(positionInBranch = 1:n()) %>%
-      ungroup()
-
-    # Relabels branches consecutively
-    branches <- unique(cylinder$branchID)
-    branch_id <- tidytable(
-      branchID = branches,
-      branch_new = 1:length(branches)
+    # Find Branches ------------------------------------------------------------
+    cylinder <- branch_from_order(
+      cylinder, "ID", "parentID", "branchOrder", "branchID"
     )
-
-    # Updates branch ordering
-    cylinder <- left_join(cylinder, branch_id, by = "branchID") %>%
-      select(-"branchID") %>%
-      rename("branchID" = "branch_new")
 
     # Total Children -----------------------------------------------------------
     cylinder <- total_children(cylinder, "parentID", "ID")
 
     # Build QSM Cylinder Network  ----------------------------------------------
-    network <- build_network(cylinder, "ID", "parentID")
+    network <- build_network(cylinder, "ID", "parentID", cache = TRUE)
 
     # Verify Topology ----------------------------------------------------------
     cylinder <- verify_topology(
@@ -223,12 +202,12 @@ update_cylinders <- function(cylinder) {
 
     # Growth Length (if missing) -----------------------------------------------
     if (!"growthLength" %in% colnames(cylinder)) {
-      cylinder <- growth_length(network, cylinder, "ID", "parentID")
+      cylinder <- growth_length(network, cylinder, "ID", "length")
     }
 
     # Reverse Branch Order (if missing) ----------------------------------------
     if (!"reverseBranchOrder" %in% colnames(cylinder)) {
-      cylinder <- reverse_branch_order( network, cylinder, "ID", "parentID")
+      cylinder <- reverse_branch_order(network, cylinder, "ID", "parentID")
     }
 
     # Branch Segments (if missing) ---------------------------------------------
@@ -239,14 +218,41 @@ update_cylinders <- function(cylinder) {
     }
 
     # Path Metrics -------------------------------------------------------------
-    if (!"distanceFromBase" %in% colnames(cylinder) & !"distanceToTwig" %in% colnames(cylinder)) {
-      cylinder <- path_metrics(network, cylinder, "ID", "length")
+    cylinder <- path_metrics(network, cylinder, "ID", "length")
+
+    # Check for existing path metrics columns
+    if (any(c("distanceToTwig.x", "distanceToTwig.y") %in% colnames(cylinder))) {
+      cylinder <- cylinder %>%
+        rename(
+          distanceToTwigSF = "distanceToTwig.x",
+          distanceToTwig = "distanceToTwig.y"
+        )
     }
+
+    if (any(c("reversePipeRadiusBranchorder.x", " reversePipeRadiusBranchorder.y") %in% colnames(cylinder))) {
+      cylinder <- cylinder %>%
+        select(-"reversePipeRadiusBranchorder.x") %>%
+        rename(reversePipeRadiusBranchorder = "reversePipeRadiusBranchorder.y")
+    }
+
+    if (any(c("reversePipeAreaBranchorder.x", " reversePipeAreaBranchorder.y") %in% colnames(cylinder))) {
+      cylinder <- cylinder %>%
+        select(-"reversePipeAreaBranchorder.x") %>%
+        rename(reversePipeAreaBranchorder = "reversePipeAreaBranchorder.y")
+    }
+
+    if (any(c("vesselVolume.x", " vesselVolume.y") %in% colnames(cylinder))) {
+      cylinder <- cylinder %>%
+        select(-"vesselVolume.x") %>%
+        rename(vesselVolume = "vesselVolume.y")
+    }
+
+    return(cylinder)
   }
   # Treegraph ------------------------------------------------------------------
   else if (all(c("p1", "p2", "ninternode") %in% colnames(cylinder))) {
     # Save All Radii -----------------------------------------------------------
-    cylinder <- mutate(cylinder, OldRadius = .data$radius, UnmodRadius = .data$radius)
+    cylinder <- mutate(cylinder, UnmodRadius = .data$radius)
 
     # Plotting Info ------------------------------------------------------------
     cylinder <- cylinder %>%
@@ -287,7 +293,7 @@ update_cylinders <- function(cylinder) {
     cylinder <- total_children(cylinder, "p2", "p1")
 
     # Build QSM Cylinder Network  ----------------------------------------------
-    network <- build_network(cylinder, "p1", "p2")
+    network <- build_network(cylinder, "p1", "p2", cache = TRUE)
 
     # Verify Topology ----------------------------------------------------------
     cylinder <- verify_topology(
@@ -311,15 +317,73 @@ update_cylinders <- function(cylinder) {
     )
 
     # Path Metrics -------------------------------------------------------------
-    cylinder <- path_metrics(network, cylinder, "p1", "length")
-  } else {
-    message(
-      "Invalid Dataframe Supplied!!!
-      \nOnly TreeQSM, SimpleForest, or Treegraph QSMs are supported.
-      \nMake sure the cylinder data frame and not the QSM list is supplied."
-    )
+    path_metrics(network, cylinder, "p1", "length")
   }
-  return(cylinder)
+  # aRchi ----------------------------------------------------------------------
+  else if (all(c("cyl_ID", "parent_ID", "branching_order") %in% colnames(cylinder))) {
+    # Cylinder Ordering --------------------------------------------------------
+    cylinder <- arrange(cylinder, .data$cyl_ID)
+    cylinder <- update_ordering(cylinder, "cyl_ID", "parent_ID")
+
+    # Branch Order -------------------------------------------------------------
+    cylinder <- mutate(cylinder, branching_order = .data$branching_order - 1)
+
+    # Adds cylinder info for plotting ------------------------------------------
+    cylinder <- cylinder %>%
+      mutate(
+        UnmodRadius = .data$radius_cyl,
+        axisX = (.data$endX - .data$startX) / .data$length,
+        axisY = (.data$endY - .data$startY) / .data$length,
+        axisZ = (.data$endZ - .data$startZ) / .data$length
+      ) %>%
+      relocate("axisX", .after = "endZ") %>%
+      relocate("axisY", .after = "axisX") %>%
+      relocate("axisZ", .after = "axisY") %>%
+      relocate("radius_cyl", .before = "radius_cyl")
+
+    # Find Branches ------------------------------------------------------------
+    cylinder <- branch_from_order(
+      cylinder, "cyl_ID", "parent_ID", "branching_order",
+      branch_name = "branch_ID"
+    )
+
+    # Total Children -----------------------------------------------------------
+    cylinder <- total_children(cylinder, "parent_ID", "cyl_ID")
+
+    # Build QSM Cylinder Network  ----------------------------------------------
+    network <- build_network(cylinder, "cyl_ID", "parent_ID", cache = TRUE)
+
+    # Verify Topology ----------------------------------------------------------
+    cylinder <- verify_topology(
+      network, cylinder, "cyl_ID", "parent_ID", "branch_ID", "branching_order"
+    )
+
+    # Growth Length ------------------------------------------------------------
+    cylinder <- growth_length(network, cylinder, "cyl_ID", "length")
+
+    # Reverse Branch Order -----------------------------------------------------
+    cylinder <- reverse_branch_order(network, cylinder, "cyl_ID", "parent_ID")
+
+    # Branch Segments ----------------------------------------------------------
+    cylinder <- branch_segments(
+      cylinder, "cyl_ID", "parent_ID", "branch_ID", "reverseBranchOrder"
+    )
+
+    # Alternate Branch Numbering -----------------------------------------------
+    cylinder <- branch_alt(
+      network, cylinder, "cyl_ID", "parent_ID", "branch_ID", "branching_order"
+    )
+
+    # Path Metrics -------------------------------------------------------------
+    path_metrics(network, cylinder, "cyl_ID", "length")
+  } else {
+    message <- paste(
+      "Unsupported QSM format provided.",
+      "i Only TreeQSM, SimpleForest, Treegraph, or aRchi QSMs are supported.",
+      sep = "\n"
+    )
+    abort(message, class = "data_format_error")
+  }
 }
 
 #' Updates cylinder parent child ordering
@@ -329,18 +393,18 @@ update_cylinders <- function(cylinder) {
 #' @returns cylinder data frame with new ids
 #' @noRd
 update_ordering <- function(cylinder, id, parent) {
-  message("Updating Cylinder Ordering")
+  inform("Updating Cylinder Ordering")
 
   # Link new id to original parents
   parent_old <- cylinder %>%
     select({{ parent }}, {{ id }}) %>%
     mutate(id_new = 1:n()) %>%
-    rename(parent_old = !!rlang::sym(parent))
+    rename(parent_old = {{ parent }})
 
   # Creates new parent and child ids
   new_id <- parent_old %>%
     left_join(
-      select(parent_old, parent_old = !!rlang::sym(id), parent_new = "id_new"),
+      select(parent_old, parent_old = {{ id }}, parent_new = "id_new"),
       by = "parent_old"
     ) %>%
     select(parent = "parent_new", id = "id_new") %>%
@@ -355,12 +419,10 @@ update_ordering <- function(cylinder, id, parent) {
     )
 
   # Join new ids
-  cylinder <- cylinder %>%
-    select(-c(!!rlang::sym(id), !!rlang::sym(parent))) %>%
+  cylinder %>%
+    select(-c({{ id }}, {{ parent }})) %>%
     bind_cols(new_id) %>%
-    rename(!!rlang::sym(parent) := "parent", !!rlang::sym(id) := "id")
-
-  return(cylinder)
+    rename({{ parent }} := "parent", {{ id }} := "id")
 }
 
 #' Finds total children for each cylinder
@@ -370,88 +432,17 @@ update_ordering <- function(cylinder, id, parent) {
 #' @returns cylinder data frame with total children
 #' @noRd
 total_children <- function(cylinder, parent, id) {
-  message("Calculating Total Children")
+  inform("Calculating Total Children")
 
   # Adds supported children for each cylinder
   total_children <- cylinder %>%
-    group_by(!!rlang::sym(parent)) %>%
-    summarize(totalChildren = n()) %>%
-    rename(!!rlang::sym(id) := !!rlang::sym(parent))
+    group_by({{ parent }}) %>%
+    summarise(totalChildren = n(), .groups = "drop") %>%
+    rename({{ id }} := {{ parent }})
 
-  # Joins total children
-  cylinder <- left_join(cylinder, total_children, by = id)
-
-  # Fill NA with 0
-  cylinder$totalChildren <- replace_na(cylinder$totalChildren, 0)
-
-  return(cylinder)
-}
-
-#' Builds QSM cylinder network with igraph
-#' @param cylinder QSM cylinder data frame
-#' @param id column name of parent cylinders
-#' @param parent column name of parent cylinders
-#' @param all_paths return all paths or just branching paths
-#' @returns list of cylinder networkd
-#' @noRd
-build_network <- function(cylinder, id, parent, all_paths = TRUE) {
-  message("Building Cylinder Network")
-
-  # Extract cylinder ids
-  id <- pull(select(cylinder, !!rlang::sym(id)))
-  parent <- pull(select(cylinder, !!rlang::sym(parent)))
-
-  # Creates QSM cylinder network
-  qsm_g <- tidytable(parent = parent, id = id)
-  qsm_g <- igraph::graph_from_data_frame(qsm_g)
-
-  # Finds twigs cylinders
-  twig_id_g <- igraph::V(qsm_g)[igraph::degree(qsm_g, mode = "out") == 0]
-  twig_id_v <- as.integer(igraph::as_ids(twig_id_g))
-
-  # Find all paths from base to twigs
-  paths_g <- igraph::all_simple_paths(qsm_g, from = 1, to = twig_id_g)
-  all_id <- as.integer(unlist(sapply(paths_g, igraph::as_ids), FALSE, FALSE))
-  all_index <- cumsum(all_id == 0)
-  all_df <- tidytable(index = all_index, id = all_id)
-
-  if (all_paths == FALSE) {
-    return(all_df)
-  }
-
-  # Find supported children
-  child_g <- qsm_g - 1 # remove cylinder 0
-  child_g <- igraph::permute(child_g, match(igraph::V(child_g)$name, id))
-  child_g <- igraph::ego(child_g, order = igraph::vcount(child_g), mode = "out")
-
-  child_id <- as.integer(unlist(child_g, FALSE, FALSE))
-  child_index <- cumsum(duplicated(child_id) & !duplicated(child_id, fromLast = TRUE)) + 1
-  child_df <- tidytable(index = child_index, id = child_id)
-
-  # Find all paths from base to cylinder
-  base_g <- igraph::all_simple_paths(qsm_g, from = 1, to = igraph::V(qsm_g))
-  base_id <- as.integer(unlist(sapply(base_g, igraph::as_ids), FALSE, FALSE))
-  base_index <- cumsum(base_id == 0)
-  base_df <- tidytable(index = base_index, id = base_id)
-
-  # Find number of paths cylinder occurs in and if it is a twig
-  cylinder_info <- tabulate(all_id)
-  cylinder_info <- tidytable(
-    id = 1:length(cylinder_info),
-    frequency = cylinder_info
-  ) %>%
-    mutate(twig = .data$id %in% !!twig_id_v) %>%
-    select("id", "frequency", "twig")
-
-  return(
-    list(
-      qsm_g = qsm_g,
-      child_df = child_df,
-      all_df = all_df,
-      base_df = base_df,
-      cylinder_info = cylinder_info
-    )
-  )
+  # Joins total children and fill na with 0
+  left_join(cylinder, total_children, by = id) %>%
+    mutate(totalChildren = replace_na(.data$totalChildren, 0))
 }
 
 #' Calculates growth length for each cylinder
@@ -462,22 +453,23 @@ build_network <- function(cylinder, id, parent, all_paths = TRUE) {
 #' @returns cylinder data frame with growth length
 #' @noRd
 growth_length <- function(network, cylinder, id, length) {
-  message("Calculating Growth Length")
+  inform("Calculating Growth Length")
 
   # Calculate growth length
   growth_length <- network$child_df %>%
     left_join(
-      select(cylinder, id = !!rlang::sym(id), length = !!rlang::sym(length)),
+      select(cylinder, id = {{ id }}, length = {{ length }}),
       by = "id"
     ) %>%
     group_by("index") %>%
-    summarize(growthLength = sum(!!rlang::sym(length), na.rm = TRUE)) %>%
-    rename(!!rlang::sym(id) := "index")
+    summarise(
+      growthLength = sum(!!rlang::sym(length), na.rm = TRUE),
+      .groups = "drop"
+    ) %>%
+    rename({{ id }} := "index")
 
   # Joins growth length
-  cylinder <- left_join(cylinder, growth_length, by = id)
-
-  return(cylinder)
+  left_join(cylinder, growth_length, by = id)
 }
 
 #' Calculates the reverse branch order for each cylinder
@@ -488,18 +480,18 @@ growth_length <- function(network, cylinder, id, length) {
 #' @returns cylinder data frame with reverse branch order
 #' @noRd
 reverse_branch_order <- function(network, cylinder, id, parent) {
-  message("Calculating Reverse Branch Order")
+  inform("Calculating Reverse Branch Order")
 
   # Find branch break points
   breaks <- cylinder %>%
-    rename(parent := !!rlang::sym(parent)) %>%
+    rename(parent := {{ parent }}) %>%
     group_by("parent") %>%
-    summarize(breaks = n())
+    summarise(breaks = n(), .groups = "drop")
 
   # Calculates Branch Nodes & Node Depth
   reverse_branch_order <- network$all_df %>%
     left_join(
-      select(cylinder, id = !!rlang::sym(id), parent = !!rlang::sym(parent)),
+      select(cylinder, id = {{ id }}, parent = {{ parent }}),
       by = "id"
     ) %>%
     left_join(breaks, by = "parent") %>%
@@ -510,14 +502,15 @@ reverse_branch_order <- function(network, cylinder, id, parent) {
       reverseBranchOrder = abs(.data$depth - max(.data$depth)) + 1
     ) %>%
     group_by("id") %>%
-    summarize(reverseBranchOrder = max(.data$reverseBranchOrder)) %>%
-    rename(!!rlang::sym(id) := "id")
+    summarise(
+      reverseBranchOrder = max(.data$reverseBranchOrder),
+      .groups = "drop"
+    ) %>%
+    rename({{ id }} := "id")
 
   # Joins reverse branch order
-  cylinder <- left_join(cylinder, reverse_branch_order, by = id) %>%
+  left_join(cylinder, reverse_branch_order, by = id) %>%
     fill("reverseBranchOrder", .direction = "down")
-
-  return(cylinder)
 }
 
 #' Calculates branching segments or "internodes"
@@ -528,11 +521,11 @@ reverse_branch_order <- function(network, cylinder, id, parent) {
 #' @returns cylinder data frame with branch segments
 #' @noRd
 branch_segments <- function(cylinder, id, parent, branch, rbo) {
-  message("Calculating Branch Segments")
+  inform("Calculating Branch Segments")
 
   # Calculates Branch Segments
   branch_segments <- cylinder %>%
-    distinct(!!rlang::sym(branch), !!rlang::sym(rbo)) %>%
+    distinct({{ branch }}, {{ rbo }}) %>%
     mutate(segment = 1:n())
 
   # Joins branch segments
@@ -540,11 +533,11 @@ branch_segments <- function(cylinder, id, parent, branch, rbo) {
 
   # Calculates Parent Segments
   child_segments <- cylinder %>%
-    select(id = !!rlang::sym(parent), childSegment = "segment") %>%
+    select(id = {{ parent }}, childSegment = "segment") %>%
     distinct("childSegment", .keep_all = TRUE)
 
   parent_segments <- left_join(
-    select(cylinder, id = !!rlang::sym(id), "segment"),
+    select(cylinder, id = {{ id }}, "segment"),
     child_segments,
     by = "id"
   ) %>%
@@ -552,10 +545,8 @@ branch_segments <- function(cylinder, id, parent, branch, rbo) {
     select(segment = "childSegment", parentSegment = "segment")
 
   # Joins parent segments
-  cylinder <- left_join(cylinder, parent_segments, by = "segment")
-  cylinder$parentSegment <- replace_na(cylinder$parentSegment, 0)
-
-  return(cylinder)
+  left_join(cylinder, parent_segments, by = "segment") %>%
+    mutate(parentSegment = replace_na(.data$parentSegment, 0))
 }
 
 #' Calculates the alternate branch index
@@ -565,7 +556,7 @@ branch_segments <- function(cylinder, id, parent, branch, rbo) {
 #' @param parent column name of parent cylinders
 #' @param branch column name of branch ids
 #' @param branch_order column name of cylinder branch order
-#' @returns cylinder data frame with growth length
+#' @returns cylinder data frame with alterate branches
 #' @noRd
 branch_alt <- function(
     network,
@@ -574,28 +565,85 @@ branch_alt <- function(
     parent,
     branch,
     branch_order) {
-  message("Calculating Alternate Branch Numbers")
+  inform("Calculating Alternate Branch Numbers")
 
   # Find first order branch bases
   first_branch <- cylinder %>%
     filter(!!rlang::sym(branch_order) == 1) %>%
-    group_by(!!rlang::sym(branch)) %>%
+    group_by({{ branch }}) %>%
     slice_head(n = 1) %>%
     ungroup() %>%
     mutate(branch_alt = 1:n()) %>%
-    select(index = !!rlang::sym(id), "branch_alt")
+    select(index = {{ id }}, "branch_alt")
 
   # Find cylinder
-  cylinder <- filter(network$child_df, .data$index %in% first_branch$index) %>%
-    rename(!!rlang::sym(id) := "id") %>%
+  filter(network$child_df, .data$index %in% first_branch$index) %>%
+    rename({{ id }} := "id") %>%
     right_join(cylinder, by = id) %>%
     left_join(first_branch, by = "index") %>%
     select(-"index") %>%
-    relocate(!!rlang::sym(id), .before = !!rlang::sym(parent))
+    relocate({{ id }}, .before = {{ parent }}) %>%
+    mutate(branch_alt = replace_na(.data$branch_alt, 0))
+}
 
-  cylinder$branch_alt <- replace_na(cylinder$branch_alt, 0)
+#' Calculates branch ids from branch order
+#' @param cylinder QSM cylinder data frame
+#' @param id column name of cylinder indexes
+#' @param parent column name of parent cylinders
+#' @param branch_order column name of cylinder branch order
+#' @param branch_name output column name for the branches
+#' @returns cylinder data frame with branches
+#' @noRd
+branch_from_order <- function(cylinder, id, parent, branch_order, branch_name) {
+  inform("Finding Branches")
 
-  return(cylinder)
+  # Dynamically select ids and branch order
+  data <- select(cylinder, all_of(id), all_of(parent), all_of(branch_order)) %>%
+    rename("id" = id, "parent" = parent, "branch_order" = branch_order)
+
+  # Initialize an empty list to store results
+  connected_segments <- list()
+
+  # Find unique branches per order
+  for (order in unique(data$branch_order)) {
+    order_df <- filter(data, .data$branch_order == order)
+    edges <- tidytable(from = order_df$parent, to = order_df$id)
+    g <- igraph::graph_from_data_frame(d = edges, directed = FALSE)
+    components <- igraph::components(g)
+    order_df$index <- components$membership[match(order_df$id, igraph::V(g)$name)]
+    connected_segments[[as.character(order)]] <- order_df
+  }
+
+  # Create unique branch ids
+  branch <- bind_rows(connected_segments) %>%
+    group_by("branch_order", "index") %>%
+    mutate(branch = cur_group_id()) %>%
+    ungroup() %>%
+    select("id", "branch")
+
+  # Join new branch ids and calculate position in branch
+  data <- left_join(data, branch) %>%
+    group_by("branch") %>%
+    mutate(positionInBranch = 1:n()) %>%
+    ungroup()
+
+  # Relabels branches consecutively
+  branches <- unique(data$branch)
+  branch <- tidytable(
+    branch = branches,
+    branch_new = 1:length(branches)
+  )
+
+  # Updates branch ordering
+  branch <- left_join(data, branch, by = "branch") %>%
+    select("id", "branch_new", "positionInBranch") %>%
+    rename(
+      {{ id }} := "id",
+      {{ branch_name }} := "branch_new"
+    )
+
+  # Joins branches
+  left_join(cylinder, branch, by = id)
 }
 
 #' Calculates path based distance metrics
@@ -606,39 +654,67 @@ branch_alt <- function(
 #' @returns cylinder data frame with branch segments
 #' @noRd
 path_metrics <- function(network, cylinder, id, length) {
-  message("Calculating Distance From Base")
+  inform("Calculating Path Metrics")
 
   # Calculate distance from base to cylinder
   base_distance <- network$base_df %>%
     left_join(
-      select(cylinder, id = !!rlang::sym(id), length = !!rlang::sym(length)),
+      select(cylinder, id = {{ id }}, length = {{ length }}),
       by = "id"
     ) %>%
     group_by("index") %>%
-    summarize(distanceFromBase = sum(.data$length, na.rm = TRUE)) %>%
-    rename(!!rlang::sym(id) := "index")
+    summarise(
+      distanceFromBase = sum(.data$length, na.rm = TRUE),
+      .groups = "drop"
+    ) %>%
+    rename({{ id }} := "index")
 
-  # Joins distance from base
-  cylinder <- left_join(cylinder, base_distance, by = id)
-
-  message("Calculating Average Distance To Twigs")
-
-  # Calculate average distance to twigs
-  twig_distance <- left_join(network$child_df, network$cylinder_info, by = "id") %>%
+  # Calculate allometric variables
+  path_df <- network$child_df %>%
+    left_join(network$cylinder_info, by = "id") %>%
     left_join(
-      select(cylinder, id = !!rlang::sym(id), length = !!rlang::sym(length)),
+      select(cylinder, id = {{ id }}, length = {{ length }}),
+      by = "id"
+    )
+
+  # Calculate path metrics
+  path_metrics <- path_df %>%
+    group_by("index") %>%
+    summarise(
+      twig_sum = sum(.data$twig),
+      length_freq_sum = sum(.data$length * .data$frequency),
+      .groups = "drop"
+    ) %>%
+    mutate(
+      distanceToTwig = .data$length_freq_sum / .data$twig_sum,
+      reversePipeAreaBranchorder = .data$twig_sum,
+      reversePipeRadiusBranchorder = sqrt(.data$twig_sum)
+    ) %>%
+    rename({{ id }} := .data$index) %>%
+    select(-c("twig_sum", "length_freq_sum"))
+
+  # Calculate vessel volume
+  vessel_volume <- path_df %>%
+    left_join(
+      select(
+        path_metrics,
+        id = {{ id }},
+        RBOPA = "reversePipeAreaBranchorder"
+      ),
       by = "id"
     ) %>%
     group_by("index") %>%
-    summarize(
-      distanceToTwig = sum(.data$length * .data$frequency) / sum(.data$twig)
+    summarise(
+      vesselVolume = sum(.data$RBOPA * .data$length), .groups = "drop"
     ) %>%
-    rename(!!rlang::sym(id) := "index")
+    rename({{ id }} := .data$index) %>%
+    select({{ id }}, "vesselVolume")
 
-  # Joins distance from twig
-  cylinder <- left_join(cylinder, twig_distance, by = id)
-
-  return(cylinder)
+  # Joins variables
+  cylinder %>%
+    left_join(base_distance, by = id) %>%
+    left_join(path_metrics, by = id) %>%
+    left_join(vessel_volume, by = id)
 }
 
 #' Verify QSM topology
@@ -659,20 +735,20 @@ verify_topology <- function(
     branch,
     branch_order,
     verify = FALSE) {
-  message("Verifying Topology")
+  inform("Verifying Topology")
 
   # Generate branch order topology
   topology <- cylinder %>%
     select(
-      id = !!rlang::sym(id),
-      parent = !!rlang::sym(parent),
-      branch_order = !!rlang::sym(branch_order)
+      id = {{ id }},
+      parent = {{ parent }},
+      branch_order = {{ branch_order }}
     ) %>%
     left_join(
       select(
         cylinder,
-        parent = !!rlang::sym(id),
-        parent_order = !!rlang::sym(branch_order)
+        parent = {{ id }},
+        parent_order = {{ branch_order }}
       ),
       by = "parent"
     )
@@ -689,34 +765,30 @@ verify_topology <- function(
   }
 
   if (length(error_topology) > 0) {
-    message("Correcting Topology")
+    inform("Correcting Topology")
 
     # Correct topology
     corrected_topology <- network$child_df %>%
       filter(.data$index %in% !!error_topology) %>%
       left_join(
-        select(topology, "id", "branch_order"),
-        by = c("index" = "id")
-      ) %>%
-      left_join(
-        select(topology, "id", "parent_order"),
+        select(topology, "id", "branch_order", "parent_order"),
         by = c("index" = "id")
       ) %>%
       mutate(branch_order = .data$branch_order + .data$parent_order + 1) %>%
       select(id, branch_order) %>%
       group_by("id") %>%
       filter(branch_order == max(.data$branch_order)) %>%
-      rename(!!rlang::sym(id) := "id")
+      rename({{ id }} := "id")
 
     # Update QSM topology
-    cylinder <- cylinder %>%
-      rename(branch_order = !!rlang::sym(branch_order)) %>%
+    cylinder %>%
+      rename(branch_order = {{ branch_order }}) %>%
       left_join(corrected_topology, by = id) %>%
       mutate(
-        !!rlang::sym(branch_order) := coalesce(.data$branch_order.y, .data$branch_order.x)
+        {{ branch_order }} := coalesce(.data$branch_order.y, .data$branch_order.x)
       ) %>%
       select(-c("branch_order.x", "branch_order.y"))
+  } else {
+    return(cylinder)
   }
-
-  return(cylinder)
 }

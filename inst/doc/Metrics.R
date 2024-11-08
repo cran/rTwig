@@ -4,6 +4,9 @@ knitr::opts_chunk$set(
   comment = "#>"
 )
 
+## ----eval=FALSE---------------------------------------------------------------
+#  devtools::install_github("https://github.com/aidanmorales/rTwig")
+
 ## ----message=FALSE, warning=FALSE---------------------------------------------
 # Load rTwig
 library(rTwig)
@@ -19,15 +22,11 @@ library(ggpubr)
 # File path to QSM
 file <- system.file("extdata/QSM.mat", package = "rTwig")
 
-# Correct QSM cylinders
-qsm <- run_rtwig(file, twig_radius = 4.23)
+# Run Real Twig
+cylinder <- run_rtwig(file, twig_radius = 4.23, metrics = FALSE)
 
 # Calculate detailed tree metrics
-metrics <- tree_metrics(qsm$cylinder)
-
-## ----echo=FALSE, warning=FALSE, message=FALSE---------------------------------
-# Future Package Cleanup
-future::plan("sequential")
+metrics <- tree_metrics(cylinder)
 
 ## ----fig.width=6, fig.height=3, fig.align='center', out.width="100%", echo=FALSE----
 metrics$stem_taper %>%
@@ -449,7 +448,7 @@ spreads %>%
 ## ----fig.width=6, fig.height=3, fig.align='center', out.width="100%", echo=FALSE----
 metrics$spreads %>%
   group_by(height_class) %>%
-  summarize(
+  summarise(
     max = max(spread_m),
     mean = mean(spread_m),
     min = min(spread_m)
@@ -465,8 +464,7 @@ metrics$spreads %>%
   theme_classic()
 
 ## ----eval=FALSE---------------------------------------------------------------
-#  rgl::plot3d(metrics$cloud, aspect = FALSE, decorate = FALSE)
-#  plot_qsm(qsm$cylinder, skeleton = TRUE)
+#  plot_qsm(cylinder, qsm$cylinder, cloud = metrics$cloud, skeleton = TRUE)
 
 ## ----eval=FALSE---------------------------------------------------------------
 #  # Stem Taper -------------------------------------------------------------------
@@ -517,7 +515,7 @@ metrics$spreads %>%
 #    )) +
 #    geom_bar(stat = "identity", position = "dodge2") +
 #    labs(
-#       title = "Diameter Distributions",
+#      title = "Diameter Distributions",
 #      x = "",
 #      y = "",
 #      fill = "Diameter Class (cm)",
@@ -878,7 +876,7 @@ metrics$spreads %>%
 #  # Vertical profile -------------------------------------------------------------
 #  metrics$spreads %>%
 #    group_by(height_class) %>%
-#    summarize(
+#    summarise(
 #      max = max(spread_m),
 #      mean = mean(spread_m),
 #      min = min(spread_m)

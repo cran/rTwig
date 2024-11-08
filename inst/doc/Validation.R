@@ -152,7 +152,7 @@ ggarrange(p3, p6, common.legend = TRUE, legend = "bottom")
 ### TOTALS #####################################################################
 total_stats <- all_biomass %>%
   group_by(Version) %>%
-  summarize(
+  summarise(
     MRE.pct = mean(tperr),
     RMSE.kg = sqrt(mean(tdiff^2, na.rm = TRUE)),
     RRMSE.pct = RMSE.kg / mean(Mt.DS) * 100
@@ -170,7 +170,7 @@ total_stats <- left_join(total_stats, CCC_total, by = "Version") %>%
 ### MAIN STEM ##################################################################
 stem_stats <- all_biomass %>%
   group_by(Version) %>%
-  summarize(
+  summarise(
     MRE.pct = mean(sperr),
     RMSE.kg = sqrt(mean(sdif^2, na.rm = TRUE)),
     RRMSE.pct = RMSE.kg / mean(Md.DS) * 100
@@ -188,7 +188,7 @@ stem_stats <- left_join(stem_stats, CCC_stem, by = "Version") %>%
 ### BRANCHES ###################################################################
 branch_stats <- all_biomass %>%
   group_by(Version) %>%
-  summarize(
+  summarise(
     MRE.pct = mean(bperr),
     RMSE.kg = sqrt(mean(bdiff^2, na.rm = TRUE)),
     RRMSE.pct = RMSE.kg / mean(Mb.DS) * 100
@@ -406,7 +406,7 @@ ggarrange(p3, p6, common.legend = TRUE, legend = "bottom")
 ### TOTALS #####################################################################
 total_stats <- all_biomass %>%
   group_by(Version) %>%
-  summarize(
+  summarise(
     MRE.pct = mean(tperr),
     RMSE.kg = sqrt(mean(tdiff^2, na.rm = TRUE)),
     RRMSE.pct = RMSE.kg / mean(Mt.DS) * 100
@@ -424,7 +424,7 @@ total_stats <- left_join(total_stats, CCC_total, by = "Version") %>%
 ### MAIN STEM ##################################################################
 stem_stats <- all_biomass %>%
   group_by(Version) %>%
-  summarize(
+  summarise(
     MRE.pct = mean(sperr),
     RMSE.kg = sqrt(mean(sdif^2, na.rm = TRUE)),
     RRMSE.pct = RMSE.kg / mean(Md.DS) * 100
@@ -442,7 +442,7 @@ stem_stats <- left_join(stem_stats, CCC_stem, by = "Version") %>%
 ### BRANCHES ###################################################################
 branch_stats <- all_biomass %>%
   group_by(Version) %>%
-  summarize(
+  summarise(
     MRE.pct = mean(bperr),
     RMSE.kg = sqrt(mean(bdiff^2, na.rm = TRUE)),
     RRMSE.pct = RMSE.kg / mean(Mb.DS) * 100
@@ -660,7 +660,7 @@ ggarrange(p3, p6, common.legend = TRUE, legend = "bottom")
 ### TOTALS #####################################################################
 total_stats <- all_biomass %>%
   group_by(Version) %>%
-  summarize(
+  summarise(
     MRE.pct = mean(tperr),
     RMSE.kg = sqrt(mean(tdiff^2, na.rm = TRUE)),
     RRMSE.pct = RMSE.kg / mean(Mt.DS) * 100
@@ -678,7 +678,7 @@ total_stats <- left_join(total_stats, CCC_total, by = "Version") %>%
 ### MAIN STEM ##################################################################
 stem_stats <- all_biomass %>%
   group_by(Version) %>%
-  summarize(
+  summarise(
     MRE.pct = mean(sperr),
     RMSE.kg = sqrt(mean(sdif^2, na.rm = TRUE)),
     RRMSE.pct = RMSE.kg / mean(Md.DS) * 100
@@ -696,7 +696,7 @@ stem_stats <- left_join(stem_stats, CCC_stem, by = "Version") %>%
 ### BRANCHES ###################################################################
 branch_stats <- all_biomass %>%
   group_by(Version) %>%
-  summarize(
+  summarise(
     MRE.pct = mean(bperr),
     RMSE.kg = sqrt(mean(bdiff^2, na.rm = TRUE)),
     RRMSE.pct = RMSE.kg / mean(Mb.DS) * 100
@@ -775,8 +775,4 @@ data[[1]] %>%
     column_labels.border.bottom.color = "black",
     table_body.border.bottom.color = "black"
   )
-
-## ----echo=FALSE, warning=FALSE, message=FALSE---------------------------------
-# Future Package Cleanup
-future::plan("sequential")
 
