@@ -5,10 +5,10 @@ knitr::opts_chunk$set(
 )
 
 ## ----eval=FALSE---------------------------------------------------------------
-#  install.packages("rTwig")
+# install.packages("rTwig")
 
 ## ----eval=FALSE---------------------------------------------------------------
-#  devtools::install_github("https://github.com/aidanmorales/rTwig")
+# devtools::install_github("https://github.com/aidanmorales/rTwig")
 
 ## ----message=FALSE------------------------------------------------------------
 library(rTwig)
@@ -18,8 +18,8 @@ library(dplyr)
 library(ggplot2)
 
 ## ----eval=FALSE---------------------------------------------------------------
-#  # If the rTwig library has been loaded
-#  twigs
+# # If the rTwig library has been loaded
+# twigs
 
 ## -----------------------------------------------------------------------------
 # If rTwig hasn't been loaded, but just the twigs are needed

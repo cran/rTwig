@@ -1,3 +1,29 @@
+# rTwig 1.3.0
+
+## New Features
+
+-   `tree_metrics()` now outputs the base diameters as a standard output in the `tree` data frame. The new variables are `d_base_qsm_cm` and `d_base_raw_cm`, which are the modified and unmodified diameter of the base of the tree or branch.
+
+## Improvements
+
+-   `tree_metrics()` is now dynamic and can accept filtered data. The QSM must be a connected structure (e.g. a whole tree or single branch). If the main stem is shorter than DBH (1.37 m), DBH will be NA, and the user will be notified. If DBH is NA, the base diameter will be used in calculations instead. If a branch is provided, the lowest order will be considered as the main stem, and the standard summary will be calculated. Previously, trying to summarize any filtered data would throw an error (issue #8).
+
+-   `qsm_summary()` is now dynamic and can accept filtered data. If the filtered QSM data is a connected structure (e.g. a branch), the lowest order will be considered as the main stem, and the standard summary will be calculated. If the QSM data is disconnected (e.g. several pruned branches), only total volume and surface area will be calculated, and the user will be notified. Additionally, DBH calculations are also dynamic. If the main stem of a tree or branch is shorter than DBH (1.37 m), DBH will be NA, and the user will be notified. Previously, trying to summarize any filtered data would throw an error (issue #7).
+
+-   Fixed a bug in `plot_qsm()` where color vectors or a vector element would throw an unintended error (issue #9).
+
+-   Fixed a bug in `update_cylinders()` where `distanceFromBase` was being joined with the wrong index values (issue #10).
+
+-   Fix an issue for CRAN, where Fedora with the clang compiler threw an error.
+
+-   Random colors are now consistently brighter.
+
+-   Update Validation vignette with more data.
+
+-   Add start-up message on package load.
+
+-   Polish up documentation.
+
 # rTwig 1.2.0
 
 ## New Features

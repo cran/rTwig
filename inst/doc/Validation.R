@@ -15,6 +15,94 @@ library(yardstick)
 library(gt)
 
 ## ----echo=FALSE, results='hide', message=FALSE, warning=FALSE-----------------
+# Import all data
+file <- system.file("extdata/validation2.csv", package = "rTwig")
+data_comp <- read.csv(file)
+
+p_all <- ggplot(data = data_comp, aes(x = dbh.cm, y = tperr, color = version, fill = version)) +
+  geom_point(aes(shape = Dataset, color = version, fill = version)) +
+  geom_smooth(method = "gam", formula = y ~ s(x, bs = "cs")) +
+  geom_hline(yintercept = 0) +
+  labs(
+    x = "DBH (cm)",
+    y = "Total Mass Error (%)",
+    color = "Method",
+    fill = "Method",
+    shape = "Dataset"
+  ) +
+  theme_classic() +
+  scale_color_manual(values = c("#D41159", "#1A85FF")) + 
+  scale_fill_manual(values = c("#D41159", "#1A85FF")) +
+  geom_hline(
+    yintercept = 10,
+    linetype = "dashed",
+    color = "black",
+    linewidth = 0.25
+  ) +
+  geom_hline(
+    yintercept = -10,
+    linetype = "dashed",
+    color = "black",
+    linewidth = 0.25,
+    show.legend = TRUE
+  )
+
+## ----echo=FALSE, fig.width=7, fig.height=4, fig.align='center', warning=FALSE----
+p_all
+
+## ----echo=FALSE, warning=FALSE------------------------------------------------
+### ALL TREES ##################################################################
+total_stats <- data_comp %>%
+  ungroup() %>%
+  group_by(version) %>%
+  summarize(
+    MRE.pct = mean(tperr, na.rm = TRUE),
+    RMSE.kg = sqrt(mean(tdiff^2, na.rm = TRUE)),
+    RRMSE.pct = RMSE.kg / mean(Mt.DS, na.rm = TRUE) * 100
+  )
+
+CCC_total <- data_comp %>%
+  ungroup() %>%
+  group_by(version) %>%
+  yardstick::ccc(Mt.TLS, Mt.DS) %>%
+  select(.estimate) %>%
+  rename(CCC = 1)
+
+total_stats <- bind_cols(total_stats, CCC_total) %>%
+  mutate(type = "total") %>%
+  relocate(type, .before = MRE.pct) %>%
+  select(-type)
+
+data <- total_stats %>%
+  mutate_if(is.numeric, round, 3) %>%
+  rename(
+    "Mean Relative Error (%)" = MRE.pct,
+    "RMSE (kg)" = RMSE.kg,
+    "Relative RMSE (%)" = RRMSE.pct
+  )
+
+data %>%
+  gt() %>%
+  # tab_header(title = unique(.$`_data`$version)) %>%
+  # cols_hide(version) %>%
+  cols_label(
+    version = "Method",
+  ) %>%
+  cols_align(
+    align = "center",
+    columns = everything()
+  ) %>%
+  tab_options(
+    table.border.top.style = "hidden",
+    table.border.bottom.style = "hidden",
+    table_body.hlines.color = "white",
+    table.font.color = "black",
+    heading.border.bottom.color = "black",
+    column_labels.border.bottom.color = "black",
+    table_body.border.bottom.color = "black"
+  )
+
+## ----echo=FALSE, results='hide', message=FALSE, warning=FALSE-----------------
 # Import Data
 file <- system.file("extdata/validation.csv", package = "rTwig")
 all_biomass <- read.csv(file) %>%

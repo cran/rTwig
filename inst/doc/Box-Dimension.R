@@ -5,14 +5,14 @@ knitr::opts_chunk$set(
 )
 
 ## ----eval=FALSE---------------------------------------------------------------
-#  install.packages("rTwig")
+# install.packages("rTwig")
 
 ## ----echo=FALSE, warning=FALSE------------------------------------------------
 # Enable RGL Plot
 library(rgl)
 
 ## ----eval=FALSE---------------------------------------------------------------
-#  devtools::install_github("https://github.com/aidanmorales/rTwig")
+# devtools::install_github("https://github.com/aidanmorales/rTwig")
 
 ## ----message=FALSE, warning=FALSE---------------------------------------------
 library(rTwig)
@@ -34,6 +34,6 @@ output[[2]]$slope
 output <- box_dimension(cloud, plot = "2D")
 
 ## ----webgl=TRUE, fig.width=7, fig.height=5, fig.align='center', eval=FALSE----
-#  # 3D Plot
-#  output <- box_dimension(cloud, plot = "3D")
+# # 3D Plot
+# output <- box_dimension(cloud, plot = "3D")
 

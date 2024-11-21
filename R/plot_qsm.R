@@ -4,14 +4,14 @@
 #'
 #' @param cylinder A QSM cylinder data frame.
 #' @param radius Radius column name either quoted or unquoted. Defaults to the modified radii.
-#' @param color Optional cylinder color parameter. Colors must be a single hex color string, a grDevices::colors(), a vector of hex colors, or a quoted/unquoted column name. It can also be set to "random" to generate a random solid color, or FALSE to disable color on export. Vectors must have the same length as the cylinder data frame.
-#' @param palette Optional color palette for numerical data. Palettes include colourvalues::color_palettes() or a user supplied RGB palette matrix with the length of cylinder.
+#' @param color Optional cylinder color parameter. Colors must be a single hex color string, a `grDevices::colors()`, a vector of hex colors, or a quoted/unquoted column name. It can also be set to "random" to generate a random solid color, or FALSE to disable color on export. Vectors must have the same length as the cylinder data frame.
+#' @param palette Optional color palette for numerical data. Palettes include `colourvalues::color_palettes()` or a user supplied RGB palette matrix with the length of cylinder.
 #' @param alpha Set the transparency of the cylinders. Defaults to 1. 1 is opaque and 0 is fully transparent.
 #' @param facets The number of facets in the polygon cross section. Defaults to 6, but can be increased to improve visual smoothness at the cost of performance and memory.
 #' @param skeleton Plot the QSM skeleton instead of cylinders. Defaults to FALSE.
 #' @param skeleton_lwd Skeleton line width. Defaults to 1.
 #' @param cloud Point cloud data frame where the first three columns are the x, y, and z coordinates in the same coordinate system as the QSM. Defaults to NULL.
-#' @param pt_color Color of the point cloud. Accepts hex colors, grDevices::colors(), or "random". Defaults to black.
+#' @param pt_color Color of the point cloud. Accepts hex colors, `grDevices::colors()`, or "random". Defaults to black.
 #' @param pt_size Size of the points. Defaults to 0.1.
 #' @param triangulation Plot the stem triangulation mesh from TreeQSM. Defaults to NULL.
 #' @param tri_color Color of the triangulation mesh. Colors must be a single hex color.
@@ -21,7 +21,7 @@
 #' @param grid Show plot grid lines. Defaults to FALSE.
 #' @param grid_color Set grid lines color. Defaults to grey.
 #' @param hover Show cylinder and branch id on mouse hover. Defaults to FALSE.
-#' @param bg_color Set the background color of the plot. Accepts hex colors or grDevices::colors(). Defaults to white.
+#' @param bg_color Set the background color of the plot. Accepts hex colors or `grDevices::colors()`. Defaults to white.
 #' @param lit Enable light source in plot. Defaults to TRUE. Can be set to FALSE.
 #' @param pan Use right mouse button to pan plot. Defaults to TRUE, but is disabled when hover is enabled.
 #' @param normalize Normalize the QSM to 0,0,0 based on the provided data. Defaults to FALSE.
@@ -100,7 +100,7 @@ plot_qsm <- function(
     if (color %in% grDevices::colors()) {
       message <- paste(
         paste(
-          "Warning: Hex colors (e.g. `#FF0000`) are preferred for plotting",
+          "Hex colors (e.g. `#FF0000`) are preferred for plotting",
           "solid colors."
         ),
         paste(
@@ -110,7 +110,7 @@ plot_qsm <- function(
         ),
         sep = "\n"
       )
-      inform(message)
+      warn(message)
     }
   }
 
@@ -124,10 +124,10 @@ plot_qsm <- function(
 
     if (alpha != 1) {
       message <- paste0(
-        "Warning: alpha transparency signifcantly degrades plot performance ",
+        "Alpha transparency signifcantly degrades plot performance ",
         "for a large number of cylinders."
       )
-      inform(message)
+      warn(message)
     }
   }
 
@@ -140,10 +140,10 @@ plot_qsm <- function(
 
   if (facets > 50) {
     message <- paste0(
-      "Warning: A large value of `facets` signifcantly degrades plot ",
+      "A large value of `facets` signifcantly degrades plot ",
       "performance for a large number of cylinders."
     )
-    inform(message)
+    warn(message)
   }
 
   if (!is_logical(skeleton)) {
@@ -526,27 +526,33 @@ plotting_colors <- function(cylinder, color, palette, branch_order) {
     "`color` is invalid.",
     "! `color` vectors must have length == nrow(cylinder).",
     paste0(
-      "i Valid inputs for `color` include: hex colors, grDevices::colors(), ",
+      "i Valid inputs for `color` include: hex colors, `grDevices::colors()`, ",
       "colnames(cylinder), or `random`."
     ),
     sep = "\n"
   )
+
+  eval_check <- try(eval(rlang::parse_expr(color)), silent = TRUE)
+
+  if (!inherits(eval_check, "try-error")) {
+    color <- eval_check
+  }
 
   if (is.null(color)) {
     default_color <- colourvalues::color_values(
       pull(cylinder, {{ branch_order }}),
       palette = "rainbow"
     )
-  } else if (color == "random") {
-    color <- generate_random_colors(1)
   } else if (is.vector(color) & length(color) > 1) {
     if (length(color) != nrow(cylinder)) {
       abort(message)
     }
+  } else if (color == "random") {
+    color <- generate_random_colors(1)
   } else if (is.vector(color) & length(color) == 1 & !(color %in% colnames(cylinder))) {
-    err_test <- try(grDevices::col2rgb(color), silent = TRUE)
+    rgb_check <- try(grDevices::col2rgb(color), silent = TRUE)
 
-    if (is.matrix(err_test)) {
+    if (is.matrix(rgb_check)) {
       color <- color
     } else {
       abort(message)

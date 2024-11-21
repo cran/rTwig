@@ -385,13 +385,13 @@ Kentucky coffee tree.</p>
 <div id="box-dimension" class="section level2">
 <h2>Box Dimension</h2>
 <p>Now we can calculate the box dimension of our point cloud with the
-<code>box_dimension</code> function. We need to specify the location of
-the x, y, and z coordinates, but it defaults to the first three columns
-in the point cloud data frame. We can also set the lower cutoff, or the
-smallest box size. Since our point cloud resolution is 1 cm, we set the
-<code>lowercutoff</code> parameter to 0.01 m, which is also the default.
-Let’s take a look at the summary data and extract the box dimension
-(slope).</p>
+<code>box_dimension()</code> function. We need to specify the location
+of the x, y, and z coordinates, but it defaults to the first three
+columns in the point cloud data frame. We can also set the lower cutoff,
+or the smallest box size. Since our point cloud resolution is 1 cm, we
+set the <code>lowercutoff</code> parameter to 0.01 m, which is also the
+default. Let’s take a look at the summary data and extract the box
+dimension (slope).</p>
 <div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" tabindex="-1"></a><span class="co"># Box Dimension Summary</span></span>
 <span id="cb5-2"><a href="#cb5-2" tabindex="-1"></a>output <span class="ot">&lt;-</span> <span class="fu">box_dimension</span>(cloud)</span>
 <span id="cb5-3"><a href="#cb5-3" tabindex="-1"></a><span class="fu">str</span>(output)</span>
