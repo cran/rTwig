@@ -67,7 +67,8 @@ oak tree (*Quercus alba*), with and without Real Twig.
 display, and C++ via `Rcpp` to efficiently build the cylinders. The
 cylinders, simulated point cloud, and skeleton can all be plotted and
 colored by any variable or user supplied color palette. It can also
-visualize stem triangulation meshes from TreeQSM.
+visualize stem triangulation meshes from TreeQSM, and leaves created by
+either QSM-FaNNI or aRchi.
 
 |                               |                                   |
 |-------------------------------|-----------------------------------|
@@ -78,7 +79,7 @@ visualize stem triangulation meshes from TreeQSM.
 
 The goal of rTwig was to provide users with tools to visualize and
 analyze QSM metrics without being tied to any particular QSM software.
-To that end, `standardize_qsm()` provides a consistent naming convention
+To that end, `standardise_qsm()` provides a consistent naming convention
 between supported QSMs, making it easy to combine and analyze QSMs from
 different sources. `tree_metrics()` calculates all of the major QSM
 metrics between all supported software. `prune_qsm()` can virtually
@@ -98,9 +99,9 @@ rTwig currently supports
 ## Functions
 
 - `run_rtwig()` runs the Real Twig method on a QSM
-- `import_qsm()` imports a QSM created by TreeQSM (.mat)
+- `import_treeqsm()` imports a QSM created by TreeQSM (.mat)
 - `import_treegraph()` imports a QSM created by Treegraph (.json)
-- `standardize_qsm()` standardizes QSM variable names across supported
+- `standardise_qsm()` standardises QSM variable names across supported
   software
 - `update_cylinders()` updates cylinder relationships and adds new QSM
   variables
@@ -109,14 +110,16 @@ rTwig currently supports
   cloud
 - `cluster_cloud()` transfers QSM variables to a point cloud or
   simulates a point cloud
-- `qsm_summary()` summarises QSM diameter, height, volume, and surface
+- `summarise_qsm()` summarises QSM diameter, height, volume, and surface
   area
 - `smooth_qsm()` connects cylinder end-to-end to smooth branch
   visualization
 - `plot_qsm()` plots QSMs and optionally their point clouds
 - `prune_qsm()` prunes a QSM by cylinder attributes, height, or diameter
   classes
-- `export_mesh()` exports a QSM as a mesh object (.ply)
+- `import_leaves()` imports leaves created by the FaNNI algorithm (.obj)
+- `export_mesh()` exports a QSM as to multiple mesh formats (.ply, .obj,
+  .stl, .txt)
 - `export_mat()` exports a QSM in a MATLAB format (.mat)
 - `box_dimension()` calculates and visualizes the structural complexity
   of a point cloud

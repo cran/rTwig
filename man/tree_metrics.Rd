@@ -4,13 +4,20 @@
 \alias{tree_metrics}
 \title{Tree Metrics}
 \usage{
-tree_metrics(cylinder)
+tree_metrics(cylinder, verify = TRUE)
 }
 \arguments{
 \item{cylinder}{QSM cylinder data frame}
+
+\item{verify}{Verify QSM topology. Defaults to TRUE. If \code{verify = TRUE},
+only topologically connected structures (e.g. a whole a tree or an
+individual branch) are eligible to run. This ensures all metrics are correct
+and verified. If \code{verify = FALSE}, the metrics are  run, but not verified.
+This is strongly discouraged, but can enable the calculation of tree metrics
+on topologically disconnected structures.}
 }
 \value{
-Returns a list of tree metric data frames and synthetic point cloud
+Returns a list of tree metric data frames and a synthetic point cloud
 }
 \description{
 Calculates tree metrics from a QSM
@@ -31,7 +38,7 @@ throughout the tree.
 
 ## TreeQSM Processing Chain
 file <- system.file("extdata/QSM.mat", package = "rTwig")
-cylinder <- import_qsm(file)$cylinder
+cylinder <- import_treeqsm(file)$cylinder
 cylinder <- update_cylinders(cylinder)
 metrics <- tree_metrics(cylinder)
 names(metrics)
@@ -52,4 +59,6 @@ names(metrics)
 \insertRef{growth_parameter2}{rTwig}
 
 \insertRef{treegraph2}{rTwig}
+
+\insertRef{path_fraction}{rTwig}
 }

@@ -7,51 +7,100 @@
 export_mesh(
   cylinder,
   filename,
+  format = "ply",
   radius = NULL,
   color = NULL,
   palette = NULL,
   facets = 6,
-  normals = FALSE
+  normals = FALSE,
+  alpha = 1
 )
 }
 \arguments{
-\item{cylinder}{QSM cylinder data frame}
+\item{cylinder}{QSM cylinder data frame.}
 
-\item{filename}{File name and path for exporting. The .ply extension is automatically added if not present.}
+\item{filename}{File name and path for exporting.
+The file extension is automatically added if not present.}
 
-\item{radius}{Radius column name either quoted or unquoted. Defaults to modified cylinders from the cylinder data frame.}
+\item{format}{Mesh file format. Defaults to \code{ply}.
+Supported formats include \code{ply}, \code{obj}, \code{stl}, and \code{blender}.
+\code{format = "blender"} exports the mesh in the qsm-blender-addons format.}
 
-\item{color}{Optional cylinder color parameter. Colors must be a single hex color string, a \code{grDevices::colors()}, a vector of hex colors, or a quoted/unquoted column name. It can also be set to "random" to generate a random solid color, or FALSE to disable color on export. Vectors must have the same length as the cylinder data frame.}
+\item{radius}{Radius column name either quoted or unquoted.
+Defaults to the modified radii.}
 
-\item{palette}{Optional color palette for numerical data. Palettes include \code{colourvalues::color_palettes()} or a user supplied RGB palette matrix with the length of cylinder.}
+\item{color}{Optional cylinder color parameter.
+\code{color} must be a single hex color string, a \code{grDevices::colors()}, a vector
+of hex colors, or a quoted/unquoted column name.
+Vectors must have the same length as the cylinder data frame.
+\code{color = "random"} will generate a random color applied to all cylinders.
+Defaults to branching order.}
 
-\item{facets}{The number of facets in the polygon cross section. Defaults to 6, but can be increased to improve visual smoothness at the cost of performance and memory.}
+\item{palette}{Optional cylinder color palette for numerical data.
+Palettes include \code{colourvalues::color_palettes()} or a user supplied RGB
+palette matrix with the length of cylinder. It can also be set to "random"
+to generate a random palette. If combined with \code{color = "random"}, each
+cylinder will have a random, distinct color.}
 
-\item{normals}{Option to export normals. Defaults to FALSE, but can be set to TRUE.}
+\item{facets}{The number of facets in the polygon cross section.
+Defaults to 6. A higher number of facets improves visual smoothness at the
+cost of plotting speed, performance and memory.}
+
+\item{normals}{Export surface normals per vertex. Defaults to FALSE.}
+
+\item{alpha}{Set the transparency of the cylinders used in the "ply" format.
+Defaults to 1. 1 is opaque and 0 is fully transparent.}
 }
 \value{
-A mesh .ply file
+A mesh file
 }
 \description{
-Exports QSM cylinder mesh using the rgl library
+Exports a QSM cylinder mesh in various formats
 }
 \examples{
 
-## TreeQSM Processing Chain
+## Load QSM
 file <- system.file("extdata/QSM.mat", package = "rTwig")
-qsm <- import_qsm(file)
+qsm <- import_treeqsm(file)
 cylinder <- qsm$cylinder
 cylinder <- update_cylinders(cylinder)
 
-filename <- tempfile(pattern = "TreeQSM_mesh")
-export_mesh(cylinder, filename)
+# PLY
+filename <- tempfile(pattern = "QSM_ply")
+export_mesh(
+  cylinder = cylinder,
+  filename = filename,
+  format = "ply",
+  color = "distanceToTwig",
+  palette = "viridis",
+  normals = TRUE
+)
 
-## SimpleForest Processing Chain
-file <- system.file("extdata/QSM.csv", package = "rTwig")
-cylinder <- read.csv(file)
-cylinder <- update_cylinders(cylinder)
+# OBJ
+filename <- tempfile(pattern = "QSM_obj")
+export_mesh(
+  cylinder = cylinder,
+  filename = filename,
+  format = "obj",
+  normals = TRUE
+)
 
-filename <- tempfile(pattern = "SimpleForest_mesh")
-export_mesh(cylinder, filename)
+# STL
+filename <- tempfile(pattern = "QSM_stl")
+export_mesh(
+  cylinder = cylinder,
+  filename = filename,
+  format = "stl",
+  normals = TRUE
+)
+
+# QSM Blender Addons
+filename <- tempfile(pattern = "QSM_blender")
+export_mesh(
+  cylinder = cylinder,
+  filename = filename,
+  format = "blender",
+  normals = TRUE
+)
 
 }

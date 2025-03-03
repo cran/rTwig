@@ -1,6 +1,7 @@
 #' Smooth QSM
 #'
-#' @description Visual smoothing of a QSM by ensuring the midpoints of all cylinders are connected
+#' @description Visually smooth a QSM by ensuring the midpoints of all cylinders
+#'  are connected. Only TreeQSM is supported.
 #'
 #' @param cylinder QSM cylinder data frame
 #'
@@ -10,7 +11,7 @@
 #' @examples
 #'
 #' file <- system.file("extdata/QSM.mat", package = "rTwig")
-#' qsm <- import_qsm(file)
+#' qsm <- import_treeqsm(file)
 #' cylinder <- qsm$cylinder
 #' cylinder <- update_cylinders(cylinder)
 #'

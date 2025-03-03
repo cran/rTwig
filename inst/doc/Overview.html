@@ -392,14 +392,15 @@ best QSM topology and volume estimates. Older versions can be used, but
 the QSM topology is poor, and volume underestimation is almost
 guaranteed.</p>
 <p>Regardless of the version of TreeQSM or MATLAB used, the
-<code>import_qsm()</code> function will import a QSM (.mat extension)
-and convert the data to a format usable by R. The user must specify
-which version of TreeQSM they are using with the <code>version</code>
-parameter. rTwig automatically defaults to use the new TreeQSM format,
-so the older format can be imported with <code>version = &quot;2.0&quot;</code>.
-<code>import_qsm()</code> also imports all QSM information, including
-cylinder, branch, treedata, rundata, pmdistance, and triangulation data,
-which are stored together as a list.</p>
+<code>import_treeqsm()</code> function will import a QSM (.mat
+extension) and convert the data to a format usable by R. The user must
+specify which version of TreeQSM they are using with the
+<code>version</code> parameter. rTwig automatically defaults to use the
+new TreeQSM format, so the older format can be imported with
+<code>version = &quot;2.0&quot;</code>. <code>import_treeqsm()</code> also imports
+all QSM information, including cylinder, branch, treedata, rundata,
+pmdistance, and triangulation data, which are stored together as a
+list.</p>
 <p>SimpleForest exports its QSMs as .csv files, so they are easy to load
 into R using the built in <code>read.csv()</code> function. If the QSM
 contains thousands of cylinders, it is much faster to use the
@@ -413,13 +414,13 @@ data. Users can extract the aRchi cylinder data with
 <code>aRchi::get_QSM()</code> before running the rTwig functions.</p>
 <div id="example-1-treeqsm-v2.3.0---2.4.1" class="section level4">
 <h4>Example 1: TreeQSM v2.3.0 - 2.4.1</h4>
-<p>We can import a QSM by supplying the <code>import_qsm()</code>
+<p>We can import a QSM by supplying the <code>import_treeqsm()</code>
 function the directory to our QSM.</p>
 <div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" tabindex="-1"></a><span class="co"># QSM directory</span></span>
 <span id="cb4-2"><a href="#cb4-2" tabindex="-1"></a>file <span class="ot">&lt;-</span> <span class="fu">system.file</span>(<span class="st">&quot;extdata/QSM.mat&quot;</span>, <span class="at">package =</span> <span class="st">&quot;rTwig&quot;</span>)</span>
 <span id="cb4-3"><a href="#cb4-3" tabindex="-1"></a></span>
 <span id="cb4-4"><a href="#cb4-4" tabindex="-1"></a><span class="co"># Import and save QSM</span></span>
-<span id="cb4-5"><a href="#cb4-5" tabindex="-1"></a>qsm <span class="ot">&lt;-</span> <span class="fu">import_qsm</span>(file)</span></code></pre></div>
+<span id="cb4-5"><a href="#cb4-5" tabindex="-1"></a>qsm <span class="ot">&lt;-</span> <span class="fu">import_treeqsm</span>(file)</span></code></pre></div>
 <p>The QSM should be a list with six elements. We can check it as
 follows:</p>
 <div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" tabindex="-1"></a><span class="fu">summary</span>(qsm)</span>
@@ -466,7 +467,7 @@ made, and take a look at the cylinder data.</p>
 <span id="cb7-2"><a href="#cb7-2" tabindex="-1"></a>file <span class="ot">&lt;-</span> <span class="fu">system.file</span>(<span class="st">&quot;extdata/QSM_2.mat&quot;</span>, <span class="at">package =</span> <span class="st">&quot;rTwig&quot;</span>)</span>
 <span id="cb7-3"><a href="#cb7-3" tabindex="-1"></a></span>
 <span id="cb7-4"><a href="#cb7-4" tabindex="-1"></a><span class="co"># Import and save QSM</span></span>
-<span id="cb7-5"><a href="#cb7-5" tabindex="-1"></a>qsm2 <span class="ot">&lt;-</span> <span class="fu">import_qsm</span>(file, <span class="at">version =</span> <span class="st">&quot;2.0&quot;</span>)</span>
+<span id="cb7-5"><a href="#cb7-5" tabindex="-1"></a>qsm2 <span class="ot">&lt;-</span> <span class="fu">import_treeqsm</span>(file, <span class="at">version =</span> <span class="st">&quot;2.0&quot;</span>)</span>
 <span id="cb7-6"><a href="#cb7-6" tabindex="-1"></a></span>
 <span id="cb7-7"><a href="#cb7-7" tabindex="-1"></a><span class="co"># QSM Info</span></span>
 <span id="cb7-8"><a href="#cb7-8" tabindex="-1"></a><span class="fu">summary</span>(qsm2)</span>
@@ -603,13 +604,13 @@ twig diameter for Kentucky coffee tree.</p>
 <h2>Summary Metrics</h2>
 <p>Before we correct the QSM, Let’s take a look at the current metrics,
 so we can compare the tree volume before and after correction. We can do
-this with the <code>qsm_summary()</code> function. If stem triangulation
-was enabled in TreeQSM, we can use it to better represent the main stem
-volume in some cases, especially when there are large buttress flares.
-We can also make a plot of the radius versus the growth length to see
-how much overestimation there is in the twig radii.</p>
+this with the <code>summarise_qsm()</code> function. If stem
+triangulation was enabled in TreeQSM, we can use it to better represent
+the main stem volume in some cases, especially when there are large
+buttress flares. We can also make a plot of the radius versus the growth
+length to see how much overestimation there is in the twig radii.</p>
 <div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" tabindex="-1"></a><span class="co"># QSM summary</span></span>
-<span id="cb13-2"><a href="#cb13-2" tabindex="-1"></a><span class="fu">qsm_summary</span>(<span class="at">cylinder =</span> cylinder, <span class="at">radius =</span> radius)[[<span class="dv">1</span>]]</span>
+<span id="cb13-2"><a href="#cb13-2" tabindex="-1"></a><span class="fu">summarise_qsm</span>(<span class="at">cylinder =</span> cylinder, <span class="at">radius =</span> radius)[[<span class="dv">1</span>]]</span>
 <span id="cb13-3"><a href="#cb13-3" tabindex="-1"></a><span class="co">#&gt; # A tidytable: 6 × 3</span></span>
 <span id="cb13-4"><a href="#cb13-4" tabindex="-1"></a><span class="co">#&gt;   branch_order tree_volume_L tree_area_m2</span></span>
 <span id="cb13-5"><a href="#cb13-5" tabindex="-1"></a><span class="co">#&gt;          &lt;int&gt;         &lt;dbl&gt;        &lt;dbl&gt;</span></span>
@@ -621,7 +622,7 @@ how much overestimation there is in the twig radii.</p>
 <span id="cb13-11"><a href="#cb13-11" tabindex="-1"></a><span class="co">#&gt; 6            5        0.0346      0.00693</span></span>
 <span id="cb13-12"><a href="#cb13-12" tabindex="-1"></a></span>
 <span id="cb13-13"><a href="#cb13-13" tabindex="-1"></a><span class="co"># QSM summary with Triangulation</span></span>
-<span id="cb13-14"><a href="#cb13-14" tabindex="-1"></a><span class="fu">qsm_summary</span>(<span class="at">cylinder =</span> cylinder, <span class="at">radius =</span> radius, <span class="at">triangulation =</span> qsm<span class="sc">$</span>triangulation)[[<span class="dv">1</span>]]</span>
+<span id="cb13-14"><a href="#cb13-14" tabindex="-1"></a><span class="fu">summarise_qsm</span>(<span class="at">cylinder =</span> cylinder, <span class="at">radius =</span> radius, <span class="at">triangulation =</span> qsm<span class="sc">$</span>triangulation)[[<span class="dv">1</span>]]</span>
 <span id="cb13-15"><a href="#cb13-15" tabindex="-1"></a><span class="co">#&gt; # A tidytable: 6 × 3</span></span>
 <span id="cb13-16"><a href="#cb13-16" tabindex="-1"></a><span class="co">#&gt;   branch_order tree_volume_L tree_area_m2</span></span>
 <span id="cb13-17"><a href="#cb13-17" tabindex="-1"></a><span class="co">#&gt;          &lt;int&gt;         &lt;dbl&gt;        &lt;dbl&gt;</span></span>
@@ -650,7 +651,7 @@ new volume estimates and diagnostic plots.</p>
 <div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" tabindex="-1"></a><span class="co"># Correct cylinder radii</span></span>
 <span id="cb14-2"><a href="#cb14-2" tabindex="-1"></a>cylinder <span class="ot">&lt;-</span> <span class="fu">correct_radii</span>(cylinder, <span class="at">twig_radius =</span> <span class="fl">4.23</span>)</span></code></pre></div>
 <div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" tabindex="-1"></a><span class="co"># Corrected QSM summary</span></span>
-<span id="cb15-2"><a href="#cb15-2" tabindex="-1"></a><span class="fu">qsm_summary</span>(cylinder, <span class="at">radius =</span> radius)[[<span class="dv">1</span>]]</span>
+<span id="cb15-2"><a href="#cb15-2" tabindex="-1"></a><span class="fu">summarise_qsm</span>(cylinder, <span class="at">radius =</span> radius)[[<span class="dv">1</span>]]</span>
 <span id="cb15-3"><a href="#cb15-3" tabindex="-1"></a><span class="co">#&gt; # A tidytable: 6 × 3</span></span>
 <span id="cb15-4"><a href="#cb15-4" tabindex="-1"></a><span class="co">#&gt;   branch_order tree_volume_L tree_area_m2</span></span>
 <span id="cb15-5"><a href="#cb15-5" tabindex="-1"></a><span class="co">#&gt;          &lt;int&gt;         &lt;dbl&gt;        &lt;dbl&gt;</span></span>

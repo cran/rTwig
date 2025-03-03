@@ -31,7 +31,7 @@ library(gt)
 file <- system.file("extdata/QSM.mat", package = "rTwig")
 
 # Import and save QSM
-qsm <- import_qsm(file)
+qsm <- import_treeqsm(file)
 
 ## ----message=FALSE------------------------------------------------------------
 summary(qsm)
@@ -49,7 +49,7 @@ str(qsm$cylinder)
 file <- system.file("extdata/QSM_2.mat", package = "rTwig")
 
 # Import and save QSM
-qsm2 <- import_qsm(file, version = "2.0")
+qsm2 <- import_treeqsm(file, version = "2.0")
 
 # QSM Info
 summary(qsm2)
@@ -89,10 +89,10 @@ filter(twigs, scientific_name == "Gymnocladus dioicus")
 
 ## ----message = FALSE----------------------------------------------------------
 # QSM summary
-qsm_summary(cylinder = cylinder, radius = radius)[[1]]
+summarise_qsm(cylinder = cylinder, radius = radius)[[1]]
 
 # QSM summary with Triangulation
-qsm_summary(cylinder = cylinder, radius = radius, triangulation = qsm$triangulation)[[1]]
+summarise_qsm(cylinder = cylinder, radius = radius, triangulation = qsm$triangulation)[[1]]
 
 ## ----echo=FALSE, fig.width = 7, fig.height = 4, fig.align='center'------------
 # Diagnostic Plot 1
@@ -117,7 +117,7 @@ cylinder <- correct_radii(cylinder, twig_radius = 4.23)
 
 ## ----r, message = FALSE-------------------------------------------------------
 # Corrected QSM summary
-qsm_summary(cylinder, radius = radius)[[1]]
+summarise_qsm(cylinder, radius = radius)[[1]]
 
 ## ----echo=FALSE, fig.width = 7, fig.height = 4, fig.align='center'------------
 # Diagnostic Plot 1

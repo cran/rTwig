@@ -11,7 +11,8 @@ correct_radii(cylinder, twig_radius, broken_branch = TRUE)
 
 \item{twig_radius}{Twig radius in millimeters}
 
-\item{broken_branch}{Enable or disable the broken branch filter. Defaults to enabled (TRUE).}
+\item{broken_branch}{Enable or disable the broken branch filter.
+Defaults to enabled (TRUE).}
 }
 \value{
 Returns a data frame
@@ -23,7 +24,7 @@ Corrects cylinder radii
 
 ## TreeQSM Processing Chain
 file <- system.file("extdata/QSM.mat", package = "rTwig")
-qsm <- import_qsm(file)
+qsm <- import_treeqsm(file)
 cylinder <- qsm$cylinder
 cylinder <- update_cylinders(cylinder)
 cylinder <- correct_radii(cylinder, twig_radius = 4.23)

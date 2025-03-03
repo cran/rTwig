@@ -1,6 +1,6 @@
 Package: rTwig
 Title: Realistic Quantitative Structure Models
-Version: 1.3.0
+Version: 1.4.0
 Authors@R: 
   c(
     person(
@@ -30,7 +30,7 @@ Suggests: knitr, rmarkdown, ggplot2, ggpmisc, ggpubr, gt, yardstick,
         dplyr, tidyr
 VignetteBuilder: knitr
 NeedsCompilation: yes
-Packaged: 2024-11-21 21:13:01 UTC; moral169
+Packaged: 2025-03-03 16:46:51 UTC; moral169
 Maintainer: Aidan Morales <moral169@msu.edu>
 URL: https://aidanmorales.github.io/rTwig/,
         https://github.com/aidanmorales/rTwig
@@ -39,4 +39,4 @@ LinkingTo: Rcpp, RcppArmadillo
 Author: Aidan Morales [aut, cre, cph] (<https://orcid.org/0009-0000-4513-4908>),
   David W. MacFarlane [aut, cph]
 Repository: CRAN
-Date/Publication: 2024-11-21 21:30:02 UTC
+Date/Publication: 2025-03-03 17:10:09 UTC

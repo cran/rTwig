@@ -28,7 +28,10 @@ rTwig::twigs
 ## -----------------------------------------------------------------------------
 unique(twigs$scientific_name)
 
-## ----fig.height=6, fig.width=7------------------------------------------------
+## -----------------------------------------------------------------------------
+twigs_index
+
+## ----fig.height=6, fig.width=7, echo = FALSE----------------------------------
 # Lets look at a subset of oak species
 twigs %>%
   filter(grepl("Quercus", scientific_name)) %>%
@@ -45,4 +48,48 @@ twigs %>%
   ) +
   scale_x_discrete(limits = rev) +
   theme_classic()
+
+twigs %>%
+  mutate(
+    size_index = case_when(
+      radius_mm <= 1 ~ "slender",
+      radius_mm > 1 & radius_mm <= 2 ~ "moderately slender",
+      radius_mm > 2 & radius_mm <= 2.5 ~ "moderately stout",
+      radius_mm > 2.5 ~ "stout"
+    ),
+    size_index = factor(
+      size_index, 
+      levels = c("slender", "moderately slender", "moderately stout", "stout")
+    ),
+    index = case_when(
+      size_index == "slender" ~ 1,
+      size_index == "moderately slender" ~ 2,
+      size_index == "moderately stout" ~ 3,
+      size_index == "stout" ~ 4
+    )
+  ) %>%
+  ggplot(
+    aes(
+      y = radius_mm,
+      x = index,
+      color = size_index,
+      fill = size_index
+    )
+  ) +
+  geom_boxplot() +
+  stat_summary(
+    fun = "mean",
+    geom = "crossbar",
+    width = 0.75,
+    colour = "black",
+    show.legend = FALSE
+  ) +
+  labs(
+    x = "",
+    y = "Twig Radius (mm)",
+    color = "Twig Size Index",
+    fill = "Twig Size Index"
+  ) +
+  theme_classic()
+
 

@@ -1,3 +1,61 @@
+# rTwig 1.4.0
+
+## New Features
+
+-   `import_leaves()`: a new function to import leaves from [QSM-FaNNI](https://github.com/InverseTampere/qsm-fanni-matlab). The leaves are stored as an `rgl::mesh3d()` object.
+-   `export_mesh()`: The function now supports multiple 3d mesh formats including, `.ply`, `.obj` and `.stl`. It also supports exporting a QSM to [Blender](https://www.blender.org/) using the [QSM Blender Addons](https://github.com/InverseTampere/qsm-blender-addons) format `.txt`.
+-   New database called `twigs_index`. This is based on qualitative size classes supported by the literature, making it easier to select a twig radius for tree species without twig measurements. More info can be found in the `Twigs` vignette.
+-   `plot_qsm()`:
+    -   Leaf meshes from `import_leaves()` or `aRchi::add_leaves()` can now be plotted with the `leaves` parameter. Leaf color and transparency can be controlled with `lf_color` and `lf_alpha` respectively.
+    -   Now accepts random color palettes for cylinders, points, or triangulation meshes by setting the `*_palette = "random"`. Additionally, the user can set a random color for each cylinder by setting both `color` and `palette` to `"random"`.
+    -   Transparency options added for point clouds and main stem triangulation mesh with `pt_alpha` and `tri_alpha`.
+    -   Point clouds can now be colored by any variable or palette using `pt_color` and `pt_palette`. The user can set a random color for each point by setting both `pt_color` and `pt_palette` to `random`.
+    -   Any `rgl::mesh3d()` objects can now be passed to `plot_qsm()` with the `mesh` parameter.
+-   `tree_metrics()`:
+    -   `modified` is a standard output in the `tree` data frame. This is an average of the binary index of the cylinders modified by Real Twig. The `rTwig` version and run date are now also saved as `version` and `run_date`.
+
+    -   `volume_change_pct` and `area_change_pct` are standard outputs of the `tree` data frame. These represent the percent change in total tree volume and surface area using `radius` and `raw_radius`.
+
+    -   `vessel_volume`, `pipe_area`, `pipe_radius`, and `twig_distance_m` are standard outputs taken from the base of the QSM.
+
+    -   Added first order branches to the branch distribution metrics to better match the output of TreeQSM. These columns include `_1` in their column names.
+
+    -   `path_fraction` is now a standard output.
+
+## Improvements
+
+-   `export_mesh()`: The function was entirely reworked using `Rcpp` for fast and efficient mesh export. All functionality that was dependent on `rgl` has been implemented in custom C++ functions.
+
+-   Function names now use British English to be consistent with R standards. American spelling will still work interchangeably (e.g. `standardize_qsm()` vs `standardise_qsm()`.
+
+-   Some functions have been renamed to follow tidy guidelines and have consistency within rTwig and other R packages (e.g. `qsm_summary()` -\> `summarise_qsm()`).
+
+-   Fixed a bug in `plot_qsm()`, where certain variable names conflicted with internal functions, resulting in an error (issue #12).
+
+-   Fixed multiple bugs in `tree_metrics()`:
+
+    -   Empty azimuth and zenith factors are now filled with 0, instead of being missing.
+
+    -   Issue #15 occurred because the cylinder verification was at too high a level and could not properly create the cylinder network when an error condition was met.
+
+    -   Fixed an issue when only a single branch or segment was provided as filtered data, causing the calculations to fail. The user is now show a warning when these edge cases occur.
+
+    -   Fixed an issue where crown base height calculations would fail if there was only one first order branch present.
+
+    -   Fixed an issue where disconnected data using `verify = FALSE` would fail crown base calculations due to missing branches (issue #18).
+
+-   `run_rtwig()`: The user can now use `standardize` and `standardise` interchangeably.
+
+-   Updated `Twigs` vignette with new info and plots.
+
+-   Updated `Dictionary` vignette describing all standard outputs from `tree_metrics()`.
+
+## Breaking Changes
+
+-   `import_qsm()` is deprecated and has been replaced with `import_treeqsm()`. The functionality is unchanged, but the name changed to be explicit about its use. `import_qsm()` still functions, but will be removed in a future rTwig release.
+
+-   `qsm_summary()` is deprecated and has been replaced with `summarise_qsm()`. The functionality is unchanged, but the name changed to be consistent with tidy guidelines. `qsm_summary()` still functions, but will be removed in a future rTwig release.
+
 # rTwig 1.3.0
 
 ## New Features
@@ -28,7 +86,7 @@
 
 ## New Features
 
--   `cluster_cloud()`: A New function to transfer QSM variables to the input point cloud or simulate a point cloud from the QSM. Efficient nearest neighbor searching is done with the C++ *nanoflann* library: <https://github.com/jlblancoc/nanoflann>
+-   `cluster_cloud()`: A new function to transfer QSM variables to the input point cloud or simulate a point cloud from the QSM. Efficient nearest neighbor searching is done with the C++ *nanoflann* library: <https://github.com/jlblancoc/nanoflann>
 
 -   `prune_qsm()`: A new function to efficiently and easily prune QSMs using multiple pruning criteria and return options.
 

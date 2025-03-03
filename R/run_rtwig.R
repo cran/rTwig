@@ -1,14 +1,25 @@
 #' Run Real Twig
 #'
-#' @description Runs all Real Twig steps
+#' @description Run the Real Twig correction and calculate tree metrics for
+#'  supported QSM formats.
 #'
 #' @param filename file path to QSM (.mat, .csv, .json)
 #' @param twig_radius Twig radius in millimeters
-#' @param metrics Calculate tree metrics? Defaults to TRUE.
-#' @param version Defaults to NULL. If using a specific version of TreeQSM, the user can specify the version (e.g. 2.4.1, 2.0, etc.).
-#' @param smooth Defaults to TRUE, if using TreeQSM. Can be set to FALSE.
-#' @param standardize Standardize QSM cylinder data? Defaults to FALSE. Can be set to TRUE.
-#' @param broken_branch Enable or disable the broken branch filter. Defaults to TRUE.
+#' @param metrics Calculate tree metrics. Defaults to TRUE.
+#'
+#' @param version If using a specific version of TreeQSM, the user can specify
+#'  the version (e.g. 2.4.1, 2.0, etc.).
+#'
+#' @param smooth Defaults to TRUE if using TreeQSM. Can be set to FALSE.
+#'
+#' @param standardise Standardise QSM cylinder data.
+#' Defaults to FALSE, but can be set to TRUE.
+#'
+#' @param broken_branch Enable or disable the broken branch filter.
+#'  Defaults to TRUE.
+#'
+#' @param ... Additional arguments allowing standardise and standardize to be
+#'  used as synonyms.
 #'
 #' @return Returns cylinder data frame or list if metrics is true.
 #' @export
@@ -26,8 +37,9 @@ run_rtwig <- function(
     metrics = TRUE,
     version = NULL,
     smooth = TRUE,
-    standardize = FALSE,
-    broken_branch = TRUE) {
+    standardise = FALSE,
+    broken_branch = TRUE,
+    ...) {
   # Check inputs ---------------------------------------------------------------
   if (is_missing(filename)) {
     message <- "argument `filename` is missing, with no default."
@@ -78,9 +90,28 @@ run_rtwig <- function(
     abort(message, class = "invalid_argument")
   }
 
-  if (!is_logical(standardize)) {
+  # Ensure standardise and standardize are synonyms
+  args <- as.list(match.call())[-1]
+
+  # Define synonyms mapping
+  synonyms <- list(standardise = c("standardise", "standardize"))
+
+  # Normalize arguments
+  for (key in names(synonyms)) {
+    for (syn in synonyms[[key]]) {
+      if (syn %in% names(args)) {
+        args[[key]] <- args[[syn]]
+        args[[syn]] <- NULL
+      }
+    }
+  }
+
+  # Assign normalized argument
+  if (!is.null(args$standardise)) standardise <- args$standardise
+
+  if (!is_logical(standardise)) {
     message <- paste0(
-      "`standardize` must be logical, not ", class(standardize), "."
+      "`standardise` must be logical, not ", class(standardise), "."
     )
     abort(message, class = "invalid_argument")
   }
@@ -101,9 +132,9 @@ run_rtwig <- function(
     # Import QSM ---------------------------------------------------------------
     if (!is.null(version)) {
       version <- version
-      cylinder <- import_qsm(file, version)$cylinder
+      cylinder <- import_treeqsm(file, version)$cylinder
     } else {
-      cylinder <- import_qsm(file)$cylinder
+      cylinder <- import_treeqsm(file)$cylinder
     }
 
     # Update Cylinders ---------------------------------------------------------
@@ -114,9 +145,9 @@ run_rtwig <- function(
       cylinder <- smooth_qsm(cylinder)
     }
 
-    # Standardize QSM ----------------------------------------------------------
-    if (standardize == TRUE) {
-      cylinder <- standardize_qsm(cylinder)
+    # Standardise QSM ----------------------------------------------------------
+    if (standardise == TRUE) {
+      cylinder <- standardise_qsm(cylinder)
     }
 
     # Correct Radii ------------------------------------------------------------
@@ -142,9 +173,9 @@ run_rtwig <- function(
     # Update Cylinders ---------------------------------------------------------
     cylinder <- update_cylinders(cylinder)
 
-    # Standardize QSM ----------------------------------------------------------
-    if (standardize == TRUE) {
-      cylinder <- standardize_qsm(cylinder)
+    # Standardise QSM ----------------------------------------------------------
+    if (standardise == TRUE) {
+      cylinder <- standardise_qsm(cylinder)
     }
 
     # Correct Radii ------------------------------------------------------------
@@ -170,9 +201,9 @@ run_rtwig <- function(
     # Update Cylinders ---------------------------------------------------------
     cylinder <- update_cylinders(cylinder)
 
-    # Standardize QSM ----------------------------------------------------------
-    if (standardize == TRUE) {
-      cylinder <- standardize_qsm(cylinder)
+    # Standardise QSM ----------------------------------------------------------
+    if (standardise == TRUE) {
+      cylinder <- standardise_qsm(cylinder)
     }
 
     # Correct Radii ------------------------------------------------------------

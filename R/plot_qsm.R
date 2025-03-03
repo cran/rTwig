@@ -1,39 +1,107 @@
 #' Plot QSM
 #'
-#' @description Efficiently plot QSMs and point clouds. Uses the Rcpp and RGL libraries as backends.
+#' @description Efficiently plot QSMs, point clouds, leaves, and stem
+#'  triangulation meshes. Plots can be combined and extensively customized.
 #'
-#' @param cylinder A QSM cylinder data frame.
-#' @param radius Radius column name either quoted or unquoted. Defaults to the modified radii.
-#' @param color Optional cylinder color parameter. Colors must be a single hex color string, a `grDevices::colors()`, a vector of hex colors, or a quoted/unquoted column name. It can also be set to "random" to generate a random solid color, or FALSE to disable color on export. Vectors must have the same length as the cylinder data frame.
-#' @param palette Optional color palette for numerical data. Palettes include `colourvalues::color_palettes()` or a user supplied RGB palette matrix with the length of cylinder.
-#' @param alpha Set the transparency of the cylinders. Defaults to 1. 1 is opaque and 0 is fully transparent.
-#' @param facets The number of facets in the polygon cross section. Defaults to 6, but can be increased to improve visual smoothness at the cost of performance and memory.
+#' @param cylinder QSM cylinder data frame.
+#'
+#' @param radius Radius column name either quoted or unquoted.
+#'  Defaults to the modified radii.
+#'
+#' @param color Optional cylinder color parameter.
+#'  `color` must be a single hex color string, a `grDevices::colors()`, a vector
+#'  of hex colors, or a quoted/unquoted column name.
+#'  Vectors must have the same length as the cylinder data frame.
+#'  `color = "random"` will generate a random color applied to all cylinders.
+#'  Defaults to branching order.
+#'
+#' @param palette Optional cylinder color palette for numerical data.
+#'  Palettes include `colourvalues::color_palettes()` or a user supplied RGB
+#'  palette matrix with the length of cylinder. It can also be set to "random"
+#'  to generate a random palette. If combined with `color = "random"`, each
+#'  cylinder will have a random, distinct color.
+#'
+#' @param alpha Set the transparency of the cylinders.
+#'  Defaults to 1. 1 is opaque and 0 is fully transparent.
+#'
+#' @param facets The number of facets in the polygon cross section.
+#'  Defaults to 6. A higher number of facets improves visual smoothness at the
+#'  cost of plotting speed, performance and memory.
+#'
 #' @param skeleton Plot the QSM skeleton instead of cylinders. Defaults to FALSE.
+#'
 #' @param skeleton_lwd Skeleton line width. Defaults to 1.
-#' @param cloud Point cloud data frame where the first three columns are the x, y, and z coordinates in the same coordinate system as the QSM. Defaults to NULL.
-#' @param pt_color Color of the point cloud. Accepts hex colors, `grDevices::colors()`, or "random". Defaults to black.
+#'
+#' @param cloud Point cloud data frame or matrix where the first three columns
+#'  are the x, y, and z coordinates.
+#'
+#' @param pt_color Optional point cloud color parameter.
+#'  `pt_color` must be a single hex color string, a `grDevices::colors()`, a vector
+#'  of hex colors, or a quoted/unquoted column name.
+#'  `pt_color = "random"` will generate a random color for all points.
+#'  Vectors must have the same length as the point cloud data frame.
+#'
+#' @param pt_palette Optional point cloud color palette for numerical data.
+#'  `pt_palette` includes `colourvalues::color_palettes()` or a user supplied RGB
+#'  palette matrix with the length of the points. It can also be set to "random"
+#'  to generate a random palette. If combined with `color = "random"`, each
+#'  point will have a random, distinct color.
+#'
 #' @param pt_size Size of the points. Defaults to 0.1.
-#' @param triangulation Plot the stem triangulation mesh from TreeQSM. Defaults to NULL.
-#' @param tri_color Color of the triangulation mesh. Colors must be a single hex color.
-#' @param tri_palette Optional triangulation color palette for z values. Supports the same inputs as palettes.
+#'
+#' @param pt_alpha Set the transparency of the point cloud.
+#'  Defaults to 1. 1 is opaque and 0 is fully transparent.
+#'
+#' @param triangulation Stem triangulation mesh from TreeQSM. Defaults to NULL.
+#'
+#' @param tri_color Color of the triangulation mesh.
+#'  Accepts hex colors, `grDevices::colors()`, or "random".
+#'  Defaults to rainbow z-axis.
+#'
+#' @param tri_palette Optional triangulation color palette for z values.
+#'  Supports the same inputs as palette.
+#'
+#' @param tri_alpha Set the transparency of the triangulation mesh.
+#'  Defaults to 1. 1 is opaque and 0 is fully transparent.
+#'
+#' @param leaves Leaf mesh in the `rgl::mesh3d()` format. Defaults to NULL.
+#'
+#' @param lf_color Color of the leaves. Defaults to leaf green.
+#'  Accepts hex colors, `grDevices::colors()`,"random", or "random_vertex".
+#'  `lf_color = "random"` assigns a random color to all leaves, while
+#'  `lf_color = "random_vertex"` which assigns a random color to each vertex.
+#'
+#' @param lf_alpha Set the transparency of the leaves.
+#'  Defaults to 1. 1 is opaque and 0 is fully transparent.
+#'
 #' @param axes Show plot axes. Defaults to TRUE.
 #' @param axes_color Set the axes color. Defaults to black.
+#'
 #' @param grid Show plot grid lines. Defaults to FALSE.
 #' @param grid_color Set grid lines color. Defaults to grey.
-#' @param hover Show cylinder and branch id on mouse hover. Defaults to FALSE.
-#' @param bg_color Set the background color of the plot. Accepts hex colors or `grDevices::colors()`. Defaults to white.
-#' @param lit Enable light source in plot. Defaults to TRUE. Can be set to FALSE.
-#' @param pan Use right mouse button to pan plot. Defaults to TRUE, but is disabled when hover is enabled.
-#' @param normalize Normalize the QSM to 0,0,0 based on the provided data. Defaults to FALSE.
 #'
-#' @return A rgl plot
+#' @param hover Show cylinder and branch id on mouse hover. Defaults to FALSE.
+#'
+#' @param bg_color Set the background color of the plot.
+#'  Accepts hex colors or `grDevices::colors()`. Defaults to white.
+#'
+#' @param lit Enable light source in plot. Defaults to FALSE.
+#'
+#' @param pan Use right mouse button to pan the plot. Defaults to TRUE.
+#'  Panning is disabled when `hover = TRUE`.
+#'
+#' @param normalize Normalize the cylinders to 0,0,0. Defaults to FALSE.
+#'
+#' @param mesh Plot any `rgl::mesh3d()` object.
+#'
+#' @return An `rgl::open3d()` plot
 #' @export
 #'
 #' @examples
 #'
-#' ## TreeQSM Processing Chain & Triangulation
+#' ## TreeQSM
 #' file <- system.file("extdata/QSM.mat", package = "rTwig")
-#' qsm <- import_qsm(file)
+#' qsm <- import_treeqsm(file)
 #' cylinder <- qsm$cylinder
 #' cylinder <- update_cylinders(cylinder)
 #' plot_qsm(cylinder)
@@ -49,22 +117,29 @@ plot_qsm <- function(
     alpha = 1,
     facets = 6,
     skeleton = FALSE,
-    skeleton_lwd = NULL,
+    skeleton_lwd = 1,
     cloud = NULL,
-    pt_color = NULL,
+    pt_color = "#000000",
+    pt_palette = NULL,
     pt_size = NULL,
+    pt_alpha = 1,
     triangulation = NULL,
     tri_color = NULL,
     tri_palette = NULL,
+    tri_alpha = 1,
+    leaves = NULL,
+    lf_color = "#5BA803",
+    lf_alpha = 1,
     axes = TRUE,
-    axes_color = NULL,
+    axes_color = "#000000",
     grid = FALSE,
-    grid_color = NULL,
+    grid_color = "#D3D3D3",
     hover = FALSE,
-    bg_color = NULL,
-    lit = TRUE,
+    bg_color = "#FFFFFF",
+    lit = FALSE,
     pan = TRUE,
-    normalize = FALSE) {
+    normalize = FALSE,
+    mesh = NULL) {
   # Check inputs ---------------------------------------------------------------
   if (!is_null(cylinder)) {
     if (!is.data.frame(cylinder)) {
@@ -86,6 +161,7 @@ plot_qsm <- function(
   # User selected columns
   radius <- select_column(rlang::enquo(radius))
   color <- select_column(rlang::enquo(color))
+  pt_color <- select_column(rlang::enquo(pt_color))
 
   if (!is_null(radius) & !any(radius %in% colnames(cylinder))) {
     abort(paste(
@@ -178,17 +254,80 @@ plot_qsm <- function(
     abort(message, class = "invalid_argument")
   }
 
+  if (!is_null(pt_alpha)) {
+    if (!is_double(pt_alpha)) {
+      message <- paste0(
+        "`pt_alpha` must be a double, not ", class(pt_alpha), "."
+      )
+      abort(message, class = "invalid_argument")
+    }
+
+    if (pt_alpha != 1) {
+      message <- paste0(
+        "Alpha transparency signifcantly degrades plot performance ",
+        "for a large number of points."
+      )
+      warn(message)
+    }
+  }
+
   if (!is.null(triangulation)) {
     if (!is_list(triangulation)) {
       message <- paste(
         paste0("`triangulation` must be a list, not ", class(triangulation), "."),
-        "i `triangulation` must be created by `import_qsm()`.",
+        "i `triangulation` must be created by `import_treeqsm()`.",
         sep = "\n"
       )
       abort(message, class = "data_format_error")
     }
     if (is_list(triangulation) & length(triangulation) == 0) {
       abort("`triangulation` is an empty list!")
+    }
+  }
+
+  if (!is_null(tri_alpha)) {
+    if (!is_double(tri_alpha)) {
+      message <- paste0(
+        "`tri_alpha` must be a double, not ", class(tri_alpha), "."
+      )
+      abort(message, class = "invalid_argument")
+    }
+
+    if (tri_alpha != 1) {
+      message <- paste0(
+        "Alpha transparency signifcantly degrades plot performance ",
+        "for a large number of triangles."
+      )
+      warn(message)
+    }
+  }
+
+  if (!is.null(leaves)) {
+    leaf_class <- class(leaves)
+    if (!("mesh3d" %in% leaf_class || "shape3d" %in% leaf_class)) {
+      message <- paste(
+        paste0("`leaves` must be an rgl mesh3d, not ", class(leaves)[1], "."),
+        "i `leaves` can be created with `import_leaves()`.",
+        sep = "\n"
+      )
+      abort(message, class = "data_format_error")
+    }
+  }
+
+  if (!is_null(lf_alpha)) {
+    if (!is_double(lf_alpha)) {
+      message <- paste0(
+        "`lf_alpha` must be a double, not ", class(lf_alpha), "."
+      )
+      abort(message, class = "invalid_argument")
+    }
+
+    if (lf_alpha != 1) {
+      message <- paste0(
+        "Alpha transparency signifcantly degrades plot performance ",
+        "for a large number of leaves."
+      )
+      warn(message)
     }
   }
 
@@ -234,6 +373,18 @@ plot_qsm <- function(
     abort(message, class = "invalid_argument")
   }
 
+  if (!is.null(mesh)) {
+    mesh_class <- class(mesh)
+    if (!("mesh3d" %in% mesh_class || "shape3d" %in% mesh_class)) {
+      message <- paste(
+        paste0("`mesh` must be an rgl mesh3d, not ", class(mesh)[1], "."),
+        "i `mesh` can be created with `rgl::as.mesh3d()`.",
+        sep = "\n"
+      )
+      abort(message, class = "data_format_error")
+    }
+  }
+
   # rTwig ----------------------------------------------------------------------
   if (all(c("id", "parent", "start_x", "branch_order") %in% colnames(cylinder))) {
     plot_data(
@@ -246,10 +397,12 @@ plot_qsm <- function(
       color = color, palette = palette, alpha = alpha,
       axes = axes, axes_color = axes_color,
       grid = grid, grid_color = grid_color, hover = hover,
-      cloud = cloud, pt_color = pt_color, pt_size = pt_size,
+      cloud = cloud, pt_color = pt_color, pt_palette = pt_palette,
+      pt_size = pt_size, pt_alpha = pt_alpha,
       bg_color = bg_color, lit = lit, pan = pan, normalize = normalize,
       triangulation = triangulation, tri_color = tri_color,
-      tri_palette = tri_palette
+      tri_palette = tri_palette, tri_alpha = tri_alpha,
+      leaves = leaves, lf_color = lf_color, lf_alpha = lf_alpha, mesh = mesh
     )
   }
   # TreeQSM --------------------------------------------------------------------
@@ -264,10 +417,12 @@ plot_qsm <- function(
       color = color, palette = palette, alpha = alpha,
       axes = axes, axes_color = axes_color,
       grid = grid, grid_color = grid_color, hover = hover,
-      cloud = cloud, pt_color = pt_color, pt_size = pt_size,
+      cloud = cloud, pt_color = pt_color, pt_palette = pt_palette,
+      pt_size = pt_size, pt_alpha = pt_alpha,
       bg_color = bg_color, lit = lit, pan = pan, normalize = normalize,
       triangulation = triangulation, tri_color = tri_color,
-      tri_palette = tri_palette
+      tri_palette = tri_palette, tri_alpha = tri_alpha,
+      leaves = leaves, lf_color = lf_color, lf_alpha = lf_alpha, mesh = mesh
     )
   }
   # SimpleForest ---------------------------------------------------------------
@@ -282,10 +437,12 @@ plot_qsm <- function(
       color = color, palette = palette, alpha = alpha,
       axes = axes, axes_color = axes_color,
       grid = grid, grid_color = grid_color, hover = hover,
-      cloud = cloud, pt_color = pt_color, pt_size = pt_size,
+      cloud = cloud, pt_color = pt_color, pt_palette = pt_palette,
+      pt_size = pt_size, pt_alpha = pt_alpha,
       bg_color = bg_color, lit = lit, pan = pan, normalize = normalize,
       triangulation = triangulation, tri_color = tri_color,
-      tri_palette = tri_palette
+      tri_palette = tri_palette, tri_alpha = tri_alpha,
+      leaves = leaves, lf_color = lf_color, lf_alpha = lf_alpha, mesh = mesh
     )
   }
   # Treegraph ------------------------------------------------------------------
@@ -300,10 +457,12 @@ plot_qsm <- function(
       color = color, palette = palette, alpha = alpha,
       axes = axes, axes_color = axes_color,
       grid = grid, grid_color = grid_color, hover = hover,
-      cloud = cloud, pt_color = pt_color, pt_size = pt_size,
+      cloud = cloud, pt_color = pt_color, pt_palette = pt_palette,
+      pt_size = pt_size, pt_alpha = pt_alpha,
       bg_color = bg_color, lit = lit, pan = pan, normalize = normalize,
       triangulation = triangulation, tri_color = tri_color,
-      tri_palette = tri_palette
+      tri_palette = tri_palette, tri_alpha = tri_alpha,
+      leaves = leaves, lf_color = lf_color, lf_alpha = lf_alpha, mesh = mesh
     )
   }
   # aRchi ----------------------------------------------------------------------
@@ -318,22 +477,28 @@ plot_qsm <- function(
       color = color, palette = palette, alpha = alpha,
       axes = axes, axes_color = axes_color,
       grid = grid, grid_color = grid_color, hover = hover,
-      cloud = cloud, pt_color = pt_color, pt_size = pt_size,
+      cloud = cloud, pt_color = pt_color, pt_palette = pt_palette,
+      pt_size = pt_size, pt_alpha = pt_alpha,
       bg_color = bg_color, lit = lit, pan = pan, normalize = normalize,
       triangulation = triangulation, tri_color = tri_color,
-      tri_palette = tri_palette
+      tri_palette = tri_palette, tri_alpha = tri_alpha,
+      leaves = leaves, lf_color = lf_color, lf_alpha = lf_alpha, mesh = mesh
     )
   }
-  # Point Cloud & Triangulation ------------------------------------------------
-  else if (any(!is.null(cloud) | !is.null(triangulation))) {
+  # Point Cloud, Triangulation, Leaves, or Mesh --------------------------------
+  else if (any(
+    !is.null(cloud) | !is.null(triangulation) | !is.null(leaves) | !is.null(mesh)
+  )) {
     plot_data(
       cylinder = cylinder,
       axes = axes, axes_color = axes_color,
       grid = grid, grid_color = grid_color, hover = hover,
-      cloud = cloud, pt_color = pt_color, pt_size = pt_size,
+      cloud = cloud, pt_color = pt_color, pt_palette = pt_palette,
+      pt_size = pt_size, pt_alpha = pt_alpha,
       bg_color = bg_color, lit = lit, pan = pan, normalize = normalize,
       triangulation = triangulation, tri_color = tri_color,
-      tri_palette = tri_palette
+      tri_palette = tri_palette, tri_alpha = tri_alpha,
+      leaves = leaves, lf_color = lf_color, lf_alpha = lf_alpha, mesh = mesh
     )
   } else {
     message <- paste(
@@ -374,7 +539,9 @@ plot_qsm <- function(
 #' @param hover hover logical
 #' @param cloud point cloud data frame or matrix
 #' @param pt_color point cloud color
+#' @param pt_palette point cloud palette
 #' @param pt_size point cloud point size
+#' @param pt_alpha point cloud alpha
 #' @param bg_color plot background color
 #' @param lit plot lighting
 #' @param pan pan plot on right click
@@ -382,7 +549,12 @@ plot_qsm <- function(
 #' @param triangulation plot triangulation mesh
 #' @param tri_color triangulation mesh color
 #' @param tri_palette triangulation palette
-#' @returns an rgl plot
+#' @param tri_alpha triangulation alpha
+#' @param leaves plot leaf mesh
+#' @param lf_color leaf mesh color
+#' @param lf_alpha leaf alpha
+#' @param mesh rgl::mesh3d object
+#' @returns an rgl::open3d plot
 #' @noRd
 plot_data <- function(
     cylinder = NULL,
@@ -413,20 +585,27 @@ plot_data <- function(
     hover = NULL,
     cloud = NULL,
     pt_color = NULL,
+    pt_palette = NULL,
     pt_size = NULL,
+    pt_alpha = NULL,
     bg_color = NULL,
     lit = NULL,
     pan = NULL,
     normalize = NULL,
     triangulation = NULL,
     tri_color = NULL,
-    tri_palette = NULL) {
+    tri_palette = NULL,
+    tri_alpha = NULL,
+    leaves = NULL,
+    lf_color = NULL,
+    lf_alpha = NULL,
+    mesh = NULL) {
   if (!is.null(cylinder)) {
     # Plotting radii -----------------------------------------------------------
     radius <- plotting_radii(cylinder, radius)
 
-    # Plotting colors ----------------------------------------------------------
-    colors <- plotting_colors(cylinder, color, palette, branch_order)
+    # Plot colors --------------------------------------------------------------
+    colors <- plot_colors(cylinder, color, palette, branch_order)
 
     # Normalize QSM ------------------------------------------------------------
     if (normalize == TRUE) {
@@ -461,12 +640,22 @@ plot_data <- function(
 
   # Plot triangulation ---------------------------------------------------------
   if (!is.null(triangulation)) {
-    plot_triangulation(triangulation, tri_color, tri_palette, lit)
+    plot_triangulation(triangulation, tri_color, tri_palette, tri_alpha, lit)
   }
 
   # Plot cloud -----------------------------------------------------------------
   if (!is.null(cloud)) {
-    plot_cloud(cloud, cylinder, pt_size, pt_color)
+    plot_cloud(cloud, pt_size, pt_color, pt_palette, pt_alpha)
+  }
+
+  # Plot leaves ----------------------------------------------------------------
+  if (!is.null(leaves)) {
+    plot_leaves(leaves, lf_color, lf_alpha, lit)
+  }
+
+  # Plot additional mesh -------------------------------------------------------
+  if (!is.null(mesh)) {
+    rgl::plot3d(mesh, add = TRUE, lit = lit)
   }
 
   # Background color -----------------------------------------------------------
@@ -486,7 +675,7 @@ plot_data <- function(
   # Plot grid lines ------------------------------------------------------------
   if (grid == TRUE) {
     if (is.null(grid_color)) {
-      grid_lines(grid, grid_color = "grey")
+      grid_lines(grid, grid_color = "#D3D3D3")
     } else {
       grid_lines(grid, grid_color)
     }
@@ -514,42 +703,59 @@ plotting_radii <- function(cylinder, radius) {
   return(radius)
 }
 
-#' Cylinder plotting colors
-#' @param cylinder QSM cylinder data frame
-#' @param radius cylinder radii column name
+#' Plot colors
+#' @param data QSM or point cloud data data frame
+#' @param radius data radii column name
 #' @param palette color palette
-#' @param branch_order cylinder branch order column name
+#' @param branch_order branch order column name
 #' @returns a vector of hex colors
 #' @noRd
-plotting_colors <- function(cylinder, color, palette, branch_order) {
+plot_colors <- function(data, color, palette, branch_order) {
   message <- paste(
     "`color` is invalid.",
-    "! `color` vectors must have length == nrow(cylinder).",
+    "! `color` vectors must have length == nrow(data).",
     paste0(
       "i Valid inputs for `color` include: hex colors, `grDevices::colors()`, ",
-      "colnames(cylinder), or `random`."
+      "colnames(data), or `random`."
     ),
     sep = "\n"
   )
 
-  eval_check <- try(eval(rlang::parse_expr(color)), silent = TRUE)
+  if (is.null(color)) {
+    color <- NULL
+  } else {
+    if (color %in% colnames(data)) {
+      color <- color
+    } else {
+      eval_check <- try(eval(rlang::parse_expr(color)), silent = TRUE)
 
-  if (!inherits(eval_check, "try-error")) {
-    color <- eval_check
+      if (!inherits(eval_check, "try-error")) {
+        color <- eval_check
+      }
+    }
   }
 
   if (is.null(color)) {
-    default_color <- colourvalues::color_values(
-      pull(cylinder, {{ branch_order }}),
-      palette = "rainbow"
-    )
+    if (!is.null(branch_order)) { # cylinder defaults
+      default_color <- colourvalues::color_values(
+        pull(data, {{ branch_order }}),
+        palette = "rainbow"
+      )
+    } else if (is.null(branch_order)) { # cloud defaults
+      default_color <- "#000000"
+    }
   } else if (is.vector(color) & length(color) > 1) {
-    if (length(color) != nrow(cylinder)) {
+    if (length(color) != nrow(data)) {
       abort(message)
     }
   } else if (color == "random") {
     color <- generate_random_colors(1)
-  } else if (is.vector(color) & length(color) == 1 & !(color %in% colnames(cylinder))) {
+
+    if (!is.null(palette) && palette == "random") {
+      colors <- generate_random_colors(nrow(data))
+      return(colors)
+    }
+  } else if (is.vector(color) & length(color) == 1 & !(color %in% colnames(data))) {
     rgb_check <- try(grDevices::col2rgb(color), silent = TRUE)
 
     if (is.matrix(rgb_check)) {
@@ -557,25 +763,31 @@ plotting_colors <- function(cylinder, color, palette, branch_order) {
     } else {
       abort(message)
     }
-  } else if (color %in% colnames(cylinder)) {
-    color <- pull(cylinder, {{ color }})
+  } else if (color %in% colnames(data)) {
+    color <- pull(data, {{ color }})
   } else {
     abort(message)
   }
 
   if (length(color) == 1) {
-    plot_colors <- rep(color, nrow(cylinder))
+    colors <- rep(color, nrow(data))
   } else if (is.null(palette) & length(color) > 1 & !is.character(color)) {
-    plot_colors <- colourvalues::color_values(color, palette = "rainbow")
+    colors <- colourvalues::color_values(color, palette = "rainbow")
   } else if (!is.null(palette) & length(color) > 1 & !is.character(color)) {
-    plot_colors <- colourvalues::color_values(color, palette = palette)
+    if (palette == "random") {
+      n <- length(colourvalues::color_palettes())
+      palettes <- colourvalues::color_palettes()
+      palette <- palettes[sample(1:n, 1)]
+    }
+
+    colors <- colourvalues::color_values(color, palette = palette)
   } else if (length(color) > 1 & is.character(color)) {
-    plot_colors <- color
+    colors <- color
   } else {
-    plot_colors <- default_color
+    colors <- default_color
   }
 
-  return(plot_colors)
+  return(colors)
 }
 
 #' Plot skeleton
@@ -670,27 +882,33 @@ plot_cylinders <- function(
   cylinder_mesh <- generate_mesh(start, axis, length, radius, facets)
   colors <- rep(colors, each = facets * 6)
 
+  # Alpha transparency
+  if (is.null(alpha)) {
+    alpha <- 1
+  } else {
+    alpha <- alpha
+  }
+
   # Plot cylinders
   rgl::triangles3d(cylinder_mesh, col = colors, lit = lit, alpha = alpha)
 }
 
 #' Plot cloud
 #' @param cloud point cloud data frame or matrix
-#' @param cylinder cylinder data frame to check for existing axes
 #' @param pt_size point size
 #' @param pt_color point cloud color
+#' @param pt_palette point cloud palette
+#' @param pt_alpha point cloud alpha
 #' @returns NA
 #' @noRd
-plot_cloud <- function(cloud, cylinder, pt_size, pt_color) {
+plot_cloud <- function(cloud, pt_size, pt_color, pt_palette, pt_alpha) {
   inform("Plotting Cloud")
 
-  if (!is.matrix(cloud)) {
-    cloud <- as.matrix(cloud[, 1:3])
-  } else {
-    cloud <- cloud[, 1:3]
+  if (!is.data.frame(cloud)) {
+    cloud <- as_tidytable(cloud)
   }
 
-  if (!is.numeric(cloud)) {
+  if (!all(map_lgl(cloud[, 1:3], is.numeric))) {
     message <- paste0(
       "The first three columns of `cloud` must be x, y, z."
     )
@@ -698,13 +916,7 @@ plot_cloud <- function(cloud, cylinder, pt_size, pt_color) {
   }
 
   # Initialize cloud inputs
-  if (is.null(pt_color)) {
-    pt_color <- "#000000"
-  } else if (pt_color == "random") {
-    pt_color <- generate_random_colors(1)
-  } else {
-    pt_color <- pt_color
-  }
+  pt_color <- plot_colors(cloud, pt_color, pt_palette, NULL)
 
   if (is.null(pt_size)) {
     pt_size <- 0.1
@@ -712,11 +924,18 @@ plot_cloud <- function(cloud, cylinder, pt_size, pt_color) {
     pt_size <- pt_size
   }
 
+  if (is.null(pt_alpha)) {
+    pt_alpha <- 1
+  } else {
+    pt_alpha <- pt_alpha
+  }
+
   # Plot cloud
   rgl::plot3d(
     x = cloud,
     col = pt_color,
     size = pt_size,
+    alpha = pt_alpha,
     add = TRUE,
     aspect = FALSE
   )
@@ -726,10 +945,16 @@ plot_cloud <- function(cloud, cylinder, pt_size, pt_color) {
 #' @param triangulation triangulation list
 #' @param tri_color triangulation color
 #' @param tri_palette triangulation palette
+#' @param tri_alpha triangulation alpha
 #' @param lit plot lighting
 #' @returns NA
 #' @noRd
-plot_triangulation <- function(triangulation, tri_color, tri_palette, lit) {
+plot_triangulation <- function(
+    triangulation,
+    tri_color,
+    tri_palette,
+    tri_alpha,
+    lit) {
   inform("Plotting Triangulation")
 
   # Extract TreeQSM triangulation data
@@ -744,15 +969,71 @@ plot_triangulation <- function(triangulation, tri_color, tri_palette, lit) {
   z_normalized <- (z - min(z)) / (max(z) - min(z))
 
   if (is.null(tri_color) & is.null(tri_palette)) {
-    colors <- colourvalues::color_values(z_normalized, palette = "rainbow")
-  } else if (is.null(tri_color) & !is.null(tri_palette)) {
-    colors <- colourvalues::color_values(z_normalized, palette = tri_palette)
+    tri_color <- colourvalues::color_values(z_normalized, palette = "rainbow")
+  } else if (!is.null(tri_color) & is.null(tri_palette)) {
+    if (tri_color == "random") {
+      tri_color <- generate_random_colors(1)
+    } else {
+      tri_color <- tri_color
+    }
+  }
+
+  if (!is.null(tri_palette)) {
+    tri_color <- colourvalues::color_values(z_normalized, palette = tri_palette)
+  }
+
+  # Alpha transparency
+  if (is.null(tri_alpha)) {
+    tri_alpha <- 1
   } else {
-    colors <- tri_color
+    tri_alpha <- tri_alpha
   }
 
   # Plot triangulation mesh
-  rgl::triangles3d(triangulation_mesh, color = colors, lit = lit)
+  rgl::triangles3d(
+    triangulation_mesh,
+    color = tri_color,
+    alpha = tri_alpha,
+    lit = lit
+  )
+}
+
+#' Plot leaves
+#' @param leaves leaf rgl mesh3d
+#' @param lf_color leaf color
+#' @param lf_alpha leaf alpha
+#' @param lit plot lighting
+#' @returns NA
+#' @noRd
+plot_leaves <- function(
+    leaves,
+    lf_color,
+    lf_alpha,
+    lit) {
+  inform("Plotting Leaves")
+
+  # Get leaf colors
+  if (!is.null(lf_color)) {
+    if (lf_color == "random") {
+      lf_color <- generate_random_colors(1)
+    } else if (lf_color == "random_vertex") {
+      lf_color <- rep(generate_random_colors(length(leaves$vb) / 3), each = 3)
+    } else {
+      lf_color <- lf_color
+    }
+  } else {
+    lf_color <- "#5BA803"
+  }
+
+  # Plot leaf mesh
+  rgl::plot3d(
+    x = leaves,
+    col = lf_color,
+    alpha = lf_alpha,
+    lit = lit,
+    add = TRUE,
+    aspect = FALSE
+  )
 }
 
 #' Plot hover
@@ -835,7 +1116,6 @@ pan_plot <- function(button = 2) {
   }
 
   rgl::rgl.setMouseCallbacks(button, begin, update)
-  # cat("Callbacks set on button", button, "of rgl device", rgl.cur(), "")
   cat("Panning plot on rgl device:", rgl.cur())
 }
 

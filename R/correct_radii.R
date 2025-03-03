@@ -4,7 +4,8 @@
 #'
 #' @param cylinder QSM cylinder data frame
 #' @param twig_radius Twig radius in millimeters
-#' @param broken_branch Enable or disable the broken branch filter. Defaults to enabled (TRUE).
+#' @param broken_branch Enable or disable the broken branch filter.
+#'  Defaults to enabled (TRUE).
 #'
 #' @return Returns a data frame
 #' @export
@@ -13,7 +14,7 @@
 #'
 #' ## TreeQSM Processing Chain
 #' file <- system.file("extdata/QSM.mat", package = "rTwig")
-#' qsm <- import_qsm(file)
+#' qsm <- import_treeqsm(file)
 #' cylinder <- qsm$cylinder
 #' cylinder <- update_cylinders(cylinder)
 #' cylinder <- correct_radii(cylinder, twig_radius = 4.23)

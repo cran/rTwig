@@ -3,8 +3,9 @@
 #' @description Updates the QSM cylinder data in preparation for radii correction
 #'
 #' @details Updates and verifies parent-child cylinder relationships and
-#' calculates new variables and metrics found throughout the supported QSM software.
-#' This function is required to run the rest of the rTwig functions.
+#'  calculates new variables and metrics found throughout the supported QSM
+#'  software. `update_cylinders()` is required to run all rTwig functions, and
+#'  is run automatically if rTwig detects a new QSM.
 #'
 #' @param cylinder QSM cylinder data frame
 #'
@@ -20,7 +21,7 @@
 #'
 #' ## TreeQSM Processing Chain
 #' file <- system.file("extdata/QSM.mat", package = "rTwig")
-#' qsm <- import_qsm(file)
+#' qsm <- import_treeqsm(file)
 #' cylinder <- qsm$cylinder
 #' cylinder <- update_cylinders(cylinder)
 #' str(cylinder)
